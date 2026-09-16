@@ -1,0 +1,93 @@
+一、打分对比
+维度	豆包自评	我的评分	冲突
+需求覆盖度	10	10	无
+结构清晰度	9	8.5	小
+契约严谨性	9	7	大
+可落地性	8	6.5	大
+观测性	9	9	无
+收敛性	9	9	无
+批判性	9	9	无
+简洁性	7	5	大
+总分	8.75	7.6	差 1.15
+分歧集中在三点：契约、可落地、简洁。 下面逐条说。
+
+二、3 个真实退化点（必须先修）
+退化 1：元素指纹从“三层可分解”退化成“单 hash”
+v1 补齐方案里 stable_id 是：
+
+text
+elem_s:{hash}_p:{path}_h:{handle}
+三层可分解，哪层失效回退哪层。
+
+v2 变成：
+
+python
+sha1(f"{e.handle}:{e.control_path}:{e.semantic_text}")
+这是退步，不是进步。 原因：
+
+handle 变了，整个 hash 就变了，L2/L3 的稳定性被 L1 拉垮。
+
+无法从 id 反查是哪层命中的，定位层无法“handle 失效 → 走 uia → 走 semantic”三级回退。
+
+碰撞后无法消歧。
+
+必须改回 v1 的三层拼接格式。
+
+退化 2：state_hash 从“规范化 + 容差 + 二次校验”退化成“关键元素集合”
+v1 补齐方案里 state_hash 有：
+
+位置量化到 2% 网格
+
+文本规范化
+
+参与/不参与字段明确
+
+碰撞后轻量二次校验
+
+v2 只说“关键元素指纹 + 标题 + 输入框摘要”，但“关键元素”怎么选、谁定义“与目标相关”、容差多少，全部没给。
+
+这不是解决“全量 hash 不稳定”，而是把问题换了个名字。
+
+必须补：关键元素选择规则 + 位置量化容差 + 二次校验。
+
+退化 3：跨进程 trace 传播完全消失
+上一轮补齐方案第四节第 1 条明确写：
+
+跨进程 trace 传播（最严重）：现有架构是子进程模型，10 层设计默认单进程，子进程间 trace_id 不传递则 span 断链、报告无法回放。
+
+v2 整篇没提这件事。
+
+这是现有代码的真实形态（uitool.py 调 ocr.py / sendinput.py），不补就是断链。
+
+必须补：子进程入口接受 --trace-id 或 UI_TRACE_ID，日志统一写同一 session 文件；跨进程时间用 time.time() + 偏移对齐。
+
+三、3 个建议调整的点
+1. 10 层砍到 7 层
+建议 MVP 先做 7 层：
+
+text
+1 编排        orchestrator
+2 环境适配    env_adapter
+3 感知        hardware + perception（合并）
+4 决策与缓存  state_cache + planner（合并，decision_cache 降级为规则优先）
+5 执行        locator + executor（合并）
+6 校验        verifier
+7 观测        observability
+contracts、regression、config 是横切，不算层。
+跑通后再按需拆细。
+
+2. 性能预算表标注“待实测校准”
+表里写的 P95 全是目标值，豆包自己说“首轮实测可能击穿”。
+
+不标“待校准”，后面会被当契约用，反而制造假失败。
+建议每行加一列 实测值 / 校准日期。
+
+3. 四种执行流的切换条件要代码化
+文档说“由 FlowPlanner.needs_llm() + Verifier 失败分级决定”，这是概念不是接口。
+
+必须补：
+
+python
+def select_flow(state, cache_hit, diff, failure) -> Flow:
+    # 返回 NORMAL / CACHE / EXCEPTION / HUMAN
+否则四种流落不了地。
