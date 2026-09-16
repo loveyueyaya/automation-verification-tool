@@ -132,6 +132,18 @@ class ShotEngine:
                 pass
 
 
+# ---------- 模块级单例（审计：避免每次调用重新初始化 DXGI 设备） ----------
+_ENGINE = None
+
+
+def get_engine(monitor=0, output_color="RGB"):
+    """全局唯一 ShotEngine；同一进程内复用 dxcam 设备（200-400ms 初始化只付一次）。"""
+    global _ENGINE
+    if _ENGINE is None:
+        _ENGINE = ShotEngine(monitor, output_color)
+    return _ENGINE
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--monitor", type=int, default=0)

@@ -107,14 +107,15 @@ def primary_monitor():
 
 # ---------- 窗口枚举 / 几何 ----------
 def find_windows(title_match=None, class_match=None, visible_only=True,
-                 cache_ttl=0.5):
-    """按标题/类名子串枚举顶层窗口，返回 [{hwnd,title,class,rect,pid}]。
-    cache_ttl>0 时结果缓存 cache_ttl 秒（重复调用零开销）。"""
+                 pid=None, cache_ttl=0.5):
+    """按标题/类名子串/进程号枚举顶层窗口，返回 [{hwnd,title,class,rect,pid}]。
+    pid: 非 None 时仅返回该进程的窗口；cache_ttl>0 时结果缓存 cache_ttl 秒。"""
     global _find_windows_cache
-    key = (title_match, class_match, visible_only)
+    key = (title_match, class_match, visible_only, pid)
+    now = time.time()
     if cache_ttl > 0 and _find_windows_cache \
-            and time.time() - _find_windows_cache["t"] < cache_ttl \
-            and _find_windows_cache["args"] == key:
+            and _find_windows_cache["args"] == key \
+            and now - _find_windows_cache["t"] < cache_ttl:
         return _find_windows_cache["result"]
     out = []
     EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p,
@@ -133,13 +134,20 @@ def find_windows(title_match=None, class_match=None, visible_only=True,
             return True
         if class_match and class_match not in class_name:
             return True
+        if pid is not None:
+            p = ctypes.wintypes.DWORD()
+            ctypes.windll.user32.GetWindowThreadProcessId(
+                hwnd, ctypes.byref(p))
+            if int(p.value) != pid:
+                return True
         r = ctypes.wintypes.RECT()
         ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(r))
-        pid = ctypes.wintypes.DWORD()
-        ctypes.windll.user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        p = ctypes.wintypes.DWORD()
+        ctypes.windll.user32.GetWindowThreadProcessId(
+            hwnd, ctypes.byref(p))
         out.append({"hwnd": int(hwnd), "title": title, "class": class_name,
                     "rect": [r.left, r.top, r.right, r.bottom],
-                    "pid": int(pid.value)})
+                    "pid": int(p.value)})
         return True
 
     ctypes.windll.user32.EnumWindows(EnumWindowsProc(cb), 0)
@@ -285,7 +293,7 @@ def wait_window_ready(hwnd, timeout=5.0):
     SMTO_ABORTIFHUNG = 2
     t0 = time.time()
     while time.time() - t0 < timeout:
-        res = ctypes.wintypes.LRESULT()
+        res = ctypes.c_long()  # LRESULT 等价 c_long（wintypes 无 LRESULT，修复自审计）
         r = ctypes.windll.user32.SendMessageTimeoutW(
             hwnd, WM_NULL, 0, 0, SMTO_ABORTIFHUNG, 200,
             ctypes.byref(res))
@@ -295,17 +303,12 @@ def wait_window_ready(hwnd, timeout=5.0):
     return False
 
 
-# ---------- 进程 / 端口（psutil 原生，零外部命令） ----------
+# ---------- 进程 / 端口 ----------
 def kill_process(name):
     """杀进程树，返回是否成功。name 如 'chrome.exe'。"""
     try:
-        import psutil
-        for p in psutil.process_iter(["name"]):
-            if (p.info.get("name") or "").lower() == name.lower():
-                try:
-                    p.terminate()
-                except Exception:
-                    p.kill()
+        subprocess.run(["taskkill", "/f", "/im", name, "/t"],
+                       capture_output=True, timeout=15)
         return True
     except Exception:
         return False
@@ -321,14 +324,20 @@ def process_count(name):
 
 
 def port_listen(port, timeout=3):
-    """检查 TCP 端口是否在监听，返回 True/False。"""
+    """检查 TCP 端口是否在监听，返回 True/False。psutil 主 + socket 兜底。"""
     try:
         import psutil
         for c in psutil.net_connections(kind="tcp"):
             if c.laddr and c.laddr.port == port \
                     and c.status == "LISTEN":
                 return True
-        return False
+    except Exception:
+        pass
+    try:
+        import socket
+        s = socket.create_connection(("127.0.0.1", port), timeout=timeout)
+        s.close()
+        return True
     except Exception:
         return False
 

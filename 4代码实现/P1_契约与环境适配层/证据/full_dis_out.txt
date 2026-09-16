@@ -1,0 +1,916 @@
+﻿==============================================================================
+### uitool.verify_text  原始(132 指令) vs 重建(141 指令)
+原始常量表: ["'验证：全屏截图 → OCR 找文本（界面是否出现期望状态）。'", "'shots'", "'verify.png'", '0', "('Image',)", "'ocr.py'", "'--image'", "'--filter'", "'--region'", "'items'", "'verify'", "'ocr_result'", "'ok'", "'fail'", "'confidence'", "('default',)", "'命中 %d 处'", "('target', 'result', 'src', 'conf', 'note', 'chain')", "('found', 'items')"]
+重建常量表: ["'验证：全屏截图 → OCR 找文本（界面是否出现期望状态）。'", "'shots'", "'verify.png'", '0', "('Image',)", "'ocr.py'", "'--image'", "'--filter'", "'--region'", "'items'", "'confidence'", "('default',)", "'verify'", "'ocr_result'", "'ok'", "'fail'", "'命中 %d 处'", "('target', 'result', 'src', 'conf', 'note', 'chain')", "('found', 'items')"]
+原始局部变量: ['session', 'text', 'region', 't', 'shot_path', 'eng', 'Image', 'items', 'hits', 'h']
+重建局部变量: ['session', 'text', 'region', 't', 'shot_path', 'eng', 'Image', 'cmd', 'items', 'hits', 'h', 'conf']
+------------------------------------------------------------------------------
+原始 dis:
+ 268            RESUME                   0
+
+ 270            LOAD_GLOBAL              0 (tl)
+                LOAD_ATTR                2 (Timeline)
+                PUSH_NULL
+                LOAD_FAST                0 (session)
+                CALL                     1
+                STORE_FAST               3 (t)
+
+ 271            LOAD_GLOBAL              4 (os)
+                LOAD_ATTR                6 (path)
+                LOAD_ATTR                9 (join + NULL|self)
+                LOAD_FAST                0 (session)
+                LOAD_CONST               1 ('shots')
+                LOAD_CONST               2 ('verify.png')
+                CALL                     3
+                STORE_FAST               4 (shot_path)
+
+ 272            LOAD_GLOBAL             10 (shot_mod)
+                LOAD_ATTR               12 (get_engine)
+                PUSH_NULL
+                CALL                     0
+                STORE_FAST               5 (eng)
+
+ 273            LOAD_CONST               3 (0)
+                LOAD_CONST               4 (('Image',))
+                IMPORT_NAME              7 (PIL)
+                IMPORT_FROM              8 (Image)
+                STORE_FAST               6 (Image)
+                POP_TOP
+
+ 274            LOAD_FAST                6 (Image)
+                LOAD_ATTR               19 (fromarray + NULL|self)
+                LOAD_FAST                5 (eng)
+                LOAD_ATTR               21 (grab + NULL|self)
+                CALL                     0
+                CALL                     1
+                LOAD_ATTR               23 (save + NULL|self)
+                LOAD_FAST                4 (shot_path)
+                CALL                     1
+                POP_TOP
+
+ 275            LOAD_GLOBAL             25 (_sub + NULL)
+                LOAD_CONST               5 ('ocr.py')
+                LOAD_CONST               6 ('--image')
+                LOAD_FAST                4 (shot_path)
+                BUILD_LIST               3
+
+ 276            LOAD_FAST                1 (text)
+                TO_BOOL
+                POP_JUMP_IF_FALSE        4 (to L1)
+                LOAD_CONST               7 ('--filter')
+                LOAD_FAST                1 (text)
+                BUILD_LIST               2
+                JUMP_FORWARD             1 (to L2)
+        L1:     BUILD_LIST               0
+
+ 275    L2:     BINARY_OP                0 (+)
+
+ 277            LOAD_FAST                2 (region)
+                TO_BOOL
+                POP_JUMP_IF_FALSE        4 (to L3)
+                LOAD_CONST               8 ('--region')
+                LOAD_FAST                2 (region)
+                BUILD_LIST               2
+                JUMP_FORWARD             1 (to L4)
+        L3:     BUILD_LIST               0
+
+ 275    L4:     BINARY_OP                0 (+)
+                CALL                     1
+                STORE_FAST               7 (items)
+
+ 278            LOAD_FAST                7 (items)
+                LOAD_ATTR               27 (get + NULL|self)
+                LOAD_CONST               9 ('items')
+                BUILD_LIST               0
+                CALL                     2
+                STORE_FAST               8 (hits)
+
+ 279            LOAD_FAST                3 (t)
+                LOAD_ATTR               29 (record + NULL|self)
+                LOAD_CONST              10 ('verify')
+                LOAD_CONST              11 ('ocr_result')
+                LOAD_FAST                1 (text)
+
+ 280            LOAD_FAST                8 (hits)
+                TO_BOOL
+                POP_JUMP_IF_FALSE        2 (to L5)
+                LOAD_CONST              12 ('ok')
+                JUMP_FORWARD             1 (to L6)
+        L5:     LOAD_CONST              13 ('fail')
+
+ 281    L6:     LOAD_GLOBAL             30 (SourceEnum)
+                LOAD_ATTR               32 (OCR)
+
+ 282            LOAD_GLOBAL             35 (max + NULL)
+                LOAD_FAST                8 (hits)
+                GET_ITER
+                LOAD_FAST_AND_CLEAR      9 (h)
+                SWAP                     2
+        L7:     BUILD_LIST               0
+                SWAP                     2
+                GET_ITER
+        L8:     FOR_ITER                30 (to L9)
+                STORE_FAST               9 (h)
+                LOAD_GLOBAL             37 (float + NULL)
+                LOAD_FAST                9 (h)
+                LOAD_ATTR               27 (get + NULL|self)
+                LOAD_CONST              14 ('confidence')
+                LOAD_CONST               3 (0)
+                CALL                     2
+                CALL                     1
+                LIST_APPEND              2
+                JUMP_BACKWARD           32 (to L8)
+        L9:     END_FOR
+                POP_TOP
+       L10:     SWAP                     2
+                STORE_FAST               9 (h)
+                LOAD_CONST               3 (0)
+                LOAD_CONST              15 (('default',))
+                CALL_KW                  2
+
+ 283            LOAD_CONST              16 ('命中 %d 处')
+                LOAD_GLOBAL             39 (len + NULL)
+                LOAD_FAST                8 (hits)
+                CALL                     1
+                BINARY_OP                6 (%)
+
+ 284            LOAD_GLOBAL             30 (SourceEnum)
+                LOAD_ATTR               32 (OCR)
+                LOAD_ATTR               40 (value)
+                BUILD_LIST               1
+
+ 279            LOAD_CONST              17 (('target', 'result', 'src', 'conf', 'note', 'chain'))
+                CALL_KW                  8
+                POP_TOP
+
+ 285            LOAD_GLOBAL             39 (len + NULL)
+                LOAD_FAST                8 (hits)
+                CALL                     1
+                LOAD_CONST               3 (0)
+                COMPARE_OP             132 (>)
+                LOAD_FAST                8 (hits)
+                LOAD_CONST              18 (('found', 'items'))
+                BUILD_CONST_KEY_MAP      2
+                RETURN_VALUE
+
+  --   L11:     SWAP                     2
+                POP_TOP
+
+ 282            SWAP                     2
+                STORE_FAST               9 (h)
+                RERAISE                  0
+ExceptionTable:
+  L7 to L10 -> L11 [11]
+------------------------------------------------------------------------------
+重建 dis:
+ 277            RESUME                   0
+
+ 279            LOAD_GLOBAL              0 (tl)
+                LOAD_ATTR                2 (Timeline)
+                PUSH_NULL
+                LOAD_FAST                0 (session)
+                CALL                     1
+                STORE_FAST               3 (t)
+
+ 280            LOAD_GLOBAL              4 (os)
+                LOAD_ATTR                6 (path)
+                LOAD_ATTR                9 (join + NULL|self)
+                LOAD_FAST                0 (session)
+                LOAD_CONST               1 ('shots')
+                LOAD_CONST               2 ('verify.png')
+                CALL                     3
+                STORE_FAST               4 (shot_path)
+
+ 281            LOAD_GLOBAL             10 (shot_mod)
+                LOAD_ATTR               12 (get_engine)
+                PUSH_NULL
+                CALL                     0
+                STORE_FAST               5 (eng)
+
+ 282            LOAD_CONST               3 (0)
+                LOAD_CONST               4 (('Image',))
+                IMPORT_NAME              7 (PIL)
+                IMPORT_FROM              8 (Image)
+                STORE_FAST               6 (Image)
+                POP_TOP
+
+ 283            LOAD_FAST                6 (Image)
+                LOAD_ATTR               19 (fromarray + NULL|self)
+                LOAD_FAST                5 (eng)
+                LOAD_ATTR               21 (grab + NULL|self)
+                CALL                     0
+                CALL                     1
+                LOAD_ATTR               23 (save + NULL|self)
+                LOAD_FAST                4 (shot_path)
+                CALL                     1
+                POP_TOP
+
+ 284            LOAD_CONST               5 ('ocr.py')
+                LOAD_CONST               6 ('--image')
+                LOAD_FAST                4 (shot_path)
+                BUILD_LIST               3
+                STORE_FAST               7 (cmd)
+
+ 285            LOAD_FAST                1 (text)
+                TO_BOOL
+                POP_JUMP_IF_FALSE        7 (to L1)
+
+ 286            LOAD_FAST                7 (cmd)
+                LOAD_CONST               7 ('--filter')
+                LOAD_FAST                1 (text)
+                BUILD_LIST               2
+                BINARY_OP               13 (+=)
+                STORE_FAST               7 (cmd)
+
+ 287    L1:     LOAD_FAST                2 (region)
+                TO_BOOL
+                POP_JUMP_IF_FALSE        7 (to L2)
+
+ 288            LOAD_FAST                7 (cmd)
+                LOAD_CONST               8 ('--region')
+                LOAD_FAST                2 (region)
+                BUILD_LIST               2
+                BINARY_OP               13 (+=)
+                STORE_FAST               7 (cmd)
+
+ 289    L2:     LOAD_GLOBAL             25 (_sub + NULL)
+                LOAD_FAST                7 (cmd)
+                CALL                     1
+                STORE_FAST               8 (items)
+
+ 290            LOAD_FAST                8 (items)
+                TO_BOOL
+                POP_JUMP_IF_FALSE       18 (to L3)
+                LOAD_FAST                8 (items)
+                LOAD_ATTR               27 (get + NULL|self)
+                LOAD_CONST               9 ('items')
+                BUILD_LIST               0
+                CALL                     2
+                JUMP_FORWARD             1 (to L4)
+        L3:     BUILD_LIST               0
+        L4:     STORE_FAST               9 (hits)
+
+ 291            LOAD_GLOBAL             29 (max + NULL)
+                LOAD_FAST                9 (hits)
+                GET_ITER
+                LOAD_FAST_AND_CLEAR     10 (h)
+                SWAP                     2
+        L5:     BUILD_LIST               0
+                SWAP                     2
+                GET_ITER
+        L6:     FOR_ITER                30 (to L7)
+                STORE_FAST              10 (h)
+                LOAD_GLOBAL             31 (float + NULL)
+                LOAD_FAST               10 (h)
+                LOAD_ATTR               27 (get + NULL|self)
+                LOAD_CONST              10 ('confidence')
+                LOAD_CONST               3 (0)
+                CALL                     2
+                CALL                     1
+                LIST_APPEND              2
+                JUMP_BACKWARD           32 (to L6)
+        L7:     END_FOR
+                POP_TOP
+        L8:     SWAP                     2
+                STORE_FAST              10 (h)
+
+ 292            LOAD_CONST               3 (0)
+
+ 291            LOAD_CONST              11 (('default',))
+                CALL_KW                  2
+                STORE_FAST              11 (conf)
+
+ 293            LOAD_FAST                3 (t)
+                LOAD_ATTR               33 (record + NULL|self)
+                LOAD_CONST              12 ('verify')
+                LOAD_CONST              13 ('ocr_result')
+                LOAD_FAST                1 (text)
+
+ 294            LOAD_FAST                9 (hits)
+                TO_BOOL
+                POP_JUMP_IF_FALSE        2 (to L9)
+                LOAD_CONST              14 ('ok')
+                JUMP_FORWARD             1 (to L10)
+        L9:     LOAD_CONST              15 ('fail')
+
+ 295   L10:     LOAD_GLOBAL             34 (SourceEnum)
+                LOAD_ATTR               36 (OCR)
+                LOAD_FAST               11 (conf)
+
+ 296            LOAD_CONST              16 ('命中 %d 处')
+                LOAD_GLOBAL             39 (len + NULL)
+                LOAD_FAST                9 (hits)
+                CALL                     1
+                BINARY_OP                6 (%)
+
+ 297            LOAD_GLOBAL             34 (SourceEnum)
+                LOAD_ATTR               36 (OCR)
+                LOAD_ATTR               40 (value)
+                BUILD_LIST               1
+
+ 293            LOAD_CONST              17 (('target', 'result', 'src', 'conf', 'note', 'chain'))
+                CALL_KW                  8
+                POP_TOP
+
+ 298            LOAD_GLOBAL             39 (len + NULL)
+                LOAD_FAST                9 (hits)
+                CALL                     1
+                LOAD_CONST               3 (0)
+                COMPARE_OP             132 (>)
+                LOAD_FAST                9 (hits)
+                LOAD_CONST              18 (('found', 'items'))
+                BUILD_CONST_KEY_MAP      2
+                RETURN_VALUE
+
+  --   L11:     SWAP                     2
+                POP_TOP
+
+ 291            SWAP                     2
+                STORE_FAST              10 (h)
+                RERAISE                  0
+ExceptionTable:
+  L5 to L8 -> L11 [4]
+
+==============================================================================
+### env.find_windows  原始(88 指令) vs 重建(91 指令)
+原始常量表: ["'按标题/类名子串枚举顶层窗口，返回 [{hwnd,title,class,rect,pid}]。\\n\\ncache_t", '0', "'args'", "'t'", "'result'", "('t', 'args', 'result')"]
+重建常量表: ["'按标题/类名子串/进程号枚举顶层窗口，返回 [{hwnd,title,class,rect,pid}]。\\npid: ", '0', "'args'", "'t'", "'result'", "('t', 'args', 'result')"]
+原始局部变量: ['title_match', 'class_match', 'visible_only', 'pid', 'cache_ttl', 'key', 'now', 'EnumWindowsProc', 'cb']
+重建局部变量: ['title_match', 'class_match', 'visible_only', 'pid', 'cache_ttl', 'key', 'now', 'EnumWindowsProc', 'cb']
+------------------------------------------------------------------------------
+原始 dis:
+  --           MAKE_CELL                0 (title_match)
+               MAKE_CELL                1 (class_match)
+               MAKE_CELL                2 (visible_only)
+               MAKE_CELL                3 (pid)
+               MAKE_CELL                9 (out)
+
+ 103           RESUME                   0
+
+ 110           LOAD_DEREF               0 (title_match)
+               LOAD_DEREF               1 (class_match)
+               LOAD_DEREF               2 (visible_only)
+               LOAD_DEREF               3 (pid)
+               BUILD_TUPLE              4
+               STORE_FAST               5 (key)
+
+ 111           LOAD_GLOBAL              0 (time)
+               LOAD_ATTR                0 (time)
+               PUSH_NULL
+               CALL                     0
+               STORE_FAST               6 (now)
+
+ 112           LOAD_FAST                4 (cache_ttl)
+               LOAD_CONST               1 (0)
+               COMPARE_OP             148 (bool(>))
+               POP_JUMP_IF_FALSE       38 (to L1)
+               LOAD_GLOBAL              2 (_find_windows_cache)
+               LOAD_CONST               2 ('args')
+               BINARY_SUBSCR
+               LOAD_FAST                5 (key)
+               COMPARE_OP              88 (bool(==))
+               POP_JUMP_IF_FALSE       25 (to L1)
+
+ 113           LOAD_FAST                6 (now)
+               LOAD_GLOBAL              2 (_find_windows_cache)
+               LOAD_CONST               3 ('t')
+               BINARY_SUBSCR
+               BINARY_OP               10 (-)
+               LOAD_FAST                4 (cache_ttl)
+               COMPARE_OP              18 (bool(<))
+               POP_JUMP_IF_FALSE        9 (to L1)
+
+ 114           LOAD_GLOBAL              2 (_find_windows_cache)
+               LOAD_CONST               4 ('result')
+               BINARY_SUBSCR
+               RETURN_VALUE
+
+ 116   L1:     BUILD_LIST               0
+               STORE_DEREF              9 (out)
+
+ 117           LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR                6 (WINFUNCTYPE)
+               PUSH_NULL
+               LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR                8 (c_bool)
+               LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR               10 (c_void_p)
+
+ 118           LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR               10 (c_void_p)
+
+ 117           CALL                     3
+               STORE_FAST               7 (EnumWindowsProc)
+
+ 120           LOAD_FAST                1 (class_match)
+               LOAD_FAST                9 (out)
+               LOAD_FAST                3 (pid)
+               LOAD_FAST                0 (title_match)
+               LOAD_FAST                2 (visible_only)
+               BUILD_TUPLE              5
+               LOAD_CONST               5 (<code object cb at 0x000002559E8BD890, file "C:\Users\Administrator\AppData\Local\Doubao\User Data\Default\.doubao\agent_mode\workspace\.user_skills\ui-toolbox\scripts\env.py", line 120>)
+               MAKE_FUNCTION
+               SET_FUNCTION_ATTRIBUTE   8 (closure)
+               STORE_FAST               8 (cb)
+
+ 148           LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR               12 (windll)
+               LOAD_ATTR               14 (user32)
+               LOAD_ATTR               17 (EnumWindows + NULL|self)
+               LOAD_FAST                7 (EnumWindowsProc)
+               PUSH_NULL
+               LOAD_FAST                8 (cb)
+               CALL                     1
+               LOAD_CONST               1 (0)
+               CALL                     2
+               POP_TOP
+
+ 149           LOAD_FAST                4 (cache_ttl)
+               LOAD_CONST               1 (0)
+               COMPARE_OP             148 (bool(>))
+               POP_JUMP_IF_FALSE       25 (to L2)
+
+ 150           LOAD_GLOBAL              0 (time)
+               LOAD_ATTR                0 (time)
+               PUSH_NULL
+               CALL                     0
+               LOAD_FAST                5 (key)
+               LOAD_DEREF               9 (out)
+               LOAD_CONST               6 (('t', 'args', 'result'))
+               BUILD_CONST_KEY_MAP      3
+               STORE_GLOBAL             1 (_find_windows_cache)
+
+ 151   L2:     LOAD_DEREF               9 (out)
+               RETURN_VALUE
+
+Disassembly of <code object cb at 0x000002559E8BD890, file "C:\Users\Administrator\AppData\Local\Doubao\User Data\Default\.doubao\agent_mode\workspace\.user_skills\ui-toolbox\scripts\env.py", line 120>:
+  --           COPY_FREE_VARS           5
+
+ 120           RESUME                   0
+
+ 121           LOAD_DEREF              12 (visible_only)
+               TO_BOOL
+               POP_JUMP_IF_FALSE       47 (to L1)
+               LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR                7 (IsWindowVisible + NULL|self)
+               LOAD_FAST                0 (hwnd)
+               CALL                     1
+               TO_BOOL
+               POP_JUMP_IF_TRUE         1 (to L1)
+
+ 122           RETURN_CONST             1 (True)
+
+ 123   L1:     LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                8 (create_unicode_buffer)
+               PUSH_NULL
+               LOAD_CONST               2 (1024)
+               CALL                     1
+               STORE_FAST               2 (buf)
+
+ 124           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               11 (GetWindowTextW + NULL|self)
+               LOAD_FAST_LOAD_FAST      2 (hwnd, buf)
+               LOAD_CONST               2 (1024)
+               CALL                     3
+               POP_TOP
+
+ 125           LOAD_FAST                2 (buf)
+               LOAD_ATTR               12 (value)
+               STORE_FAST               3 (title)
+
+ 126           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                8 (create_unicode_buffer)
+               PUSH_NULL
+               LOAD_CONST               3 (256)
+               CALL                     1
+               STORE_FAST               4 (cls)
+
+ 127           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               15 (GetClassNameW + NULL|self)
+               LOAD_FAST_LOAD_FAST      4 (hwnd, cls)
+               LOAD_CONST               3 (256)
+               CALL                     3
+               POP_TOP
+
+ 128           LOAD_FAST                4 (cls)
+               LOAD_ATTR               12 (value)
+               STORE_FAST               5 (class_name)
+
+ 129           LOAD_DEREF              11 (title_match)
+               TO_BOOL
+               POP_JUMP_IF_FALSE        7 (to L2)
+               LOAD_DEREF              11 (title_match)
+               LOAD_FAST                3 (title)
+               CONTAINS_OP              1
+               POP_JUMP_IF_FALSE        1 (to L2)
+
+ 130           RETURN_CONST             1 (True)
+
+ 131   L2:     LOAD_DEREF               8 (class_match)
+               TO_BOOL
+               POP_JUMP_IF_FALSE        7 (to L3)
+               LOAD_DEREF               8 (class_match)
+               LOAD_FAST                5 (class_name)
+               CONTAINS_OP              1
+               POP_JUMP_IF_FALSE        1 (to L3)
+
+ 132           RETURN_CONST             1 (True)
+
+ 133   L3:     LOAD_DEREF              10 (pid)
+               POP_JUMP_IF_NONE       118 (to L4)
+
+ 134           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               16 (wintypes)
+               LOAD_ATTR               19 (DWORD + NULL|self)
+               CALL                     0
+               STORE_FAST               6 (p)
+
+ 135           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               21 (GetWindowThreadProcessId + NULL|self)
+
+ 136           LOAD_FAST                0 (hwnd)
+               LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               22 (byref)
+               PUSH_NULL
+               LOAD_FAST                6 (p)
+               CALL                     1
+
+ 135           CALL                     2
+               POP_TOP
+
+ 137           LOAD_GLOBAL             25 (int + NULL)
+               LOAD_FAST                6 (p)
+               LOAD_ATTR               12 (value)
+               CALL                     1
+               LOAD_DEREF              10 (pid)
+               COMPARE_OP             119 (bool(!=))
+               POP_JUMP_IF_FALSE        1 (to L4)
+
+ 138           RETURN_CONST             1 (True)
+
+ 139   L4:     LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               16 (wintypes)
+               LOAD_ATTR               27 (RECT + NULL|self)
+               CALL                     0
+               STORE_FAST               7 (r)
+
+ 140           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               29 (GetWindowRect + NULL|self)
+               LOAD_FAST                0 (hwnd)
+               LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               22 (byref)
+               PUSH_NULL
+               LOAD_FAST                7 (r)
+               CALL                     1
+               CALL                     2
+               POP_TOP
+
+ 141           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               16 (wintypes)
+               LOAD_ATTR               19 (DWORD + NULL|self)
+               CALL                     0
+               STORE_FAST               6 (p)
+
+ 142           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               21 (GetWindowThreadProcessId + NULL|self)
+               LOAD_FAST                0 (hwnd)
+               LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               22 (byref)
+               PUSH_NULL
+               LOAD_FAST                6 (p)
+               CALL                     1
+               CALL                     2
+               POP_TOP
+
+ 143           LOAD_DEREF               9 (out)
+               LOAD_ATTR               31 (append + NULL|self)
+               LOAD_GLOBAL             25 (int + NULL)
+               LOAD_FAST                0 (hwnd)
+               CALL                     1
+               LOAD_FAST_LOAD_FAST     53 (title, class_name)
+
+ 144           LOAD_FAST                7 (r)
+               LOAD_ATTR               32 (left)
+               LOAD_FAST                7 (r)
+               LOAD_ATTR               34 (top)
+               LOAD_FAST                7 (r)
+               LOAD_ATTR               36 (right)
+               LOAD_FAST                7 (r)
+               LOAD_ATTR               38 (bottom)
+               BUILD_LIST               4
+
+ 145           LOAD_GLOBAL             25 (int + NULL)
+               LOAD_FAST                6 (p)
+               LOAD_ATTR               12 (value)
+               CALL                     1
+
+ 143           LOAD_CONST               4 (('hwnd', 'title', 'class', 'rect', 'pid'))
+               BUILD_CONST_KEY_MAP      5
+               CALL                     1
+               POP_TOP
+
+ 146           RETURN_CONST             1 (True)
+------------------------------------------------------------------------------
+重建 dis:
+  --           MAKE_CELL                0 (title_match)
+               MAKE_CELL                1 (class_match)
+               MAKE_CELL                2 (visible_only)
+               MAKE_CELL                3 (pid)
+               MAKE_CELL                9 (out)
+
+ 109           RESUME                   0
+
+ 114           LOAD_DEREF               0 (title_match)
+               LOAD_DEREF               1 (class_match)
+               LOAD_DEREF               2 (visible_only)
+               LOAD_DEREF               3 (pid)
+               BUILD_TUPLE              4
+               STORE_FAST               5 (key)
+
+ 115           LOAD_GLOBAL              0 (time)
+               LOAD_ATTR                0 (time)
+               PUSH_NULL
+               CALL                     0
+               STORE_FAST               6 (now)
+
+ 116           LOAD_FAST                4 (cache_ttl)
+               LOAD_CONST               1 (0)
+               COMPARE_OP             148 (bool(>))
+               POP_JUMP_IF_FALSE       49 (to L1)
+               LOAD_GLOBAL              2 (_find_windows_cache)
+               TO_BOOL
+               POP_JUMP_IF_FALSE       38 (to L1)
+
+ 117           LOAD_GLOBAL              2 (_find_windows_cache)
+               LOAD_CONST               2 ('args')
+               BINARY_SUBSCR
+               LOAD_FAST                5 (key)
+               COMPARE_OP              88 (bool(==))
+               POP_JUMP_IF_FALSE       25 (to L1)
+
+ 118           LOAD_FAST                6 (now)
+               LOAD_GLOBAL              2 (_find_windows_cache)
+               LOAD_CONST               3 ('t')
+               BINARY_SUBSCR
+               BINARY_OP               10 (-)
+               LOAD_FAST                4 (cache_ttl)
+               COMPARE_OP              18 (bool(<))
+               POP_JUMP_IF_FALSE        9 (to L1)
+
+ 119           LOAD_GLOBAL              2 (_find_windows_cache)
+               LOAD_CONST               4 ('result')
+               BINARY_SUBSCR
+               RETURN_VALUE
+
+ 120   L1:     BUILD_LIST               0
+               STORE_DEREF              9 (out)
+
+ 121           LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR                6 (WINFUNCTYPE)
+               PUSH_NULL
+               LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR                8 (c_bool)
+               LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR               10 (c_void_p)
+
+ 122           LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR               10 (c_void_p)
+
+ 121           CALL                     3
+               STORE_FAST               7 (EnumWindowsProc)
+
+ 124           LOAD_FAST                1 (class_match)
+               LOAD_FAST                9 (out)
+               LOAD_FAST                3 (pid)
+               LOAD_FAST                0 (title_match)
+               LOAD_FAST                2 (visible_only)
+               BUILD_TUPLE              5
+               LOAD_CONST               5 (<code object cb at 0x000002559E8C1E90, file "env.py", line 124>)
+               MAKE_FUNCTION
+               SET_FUNCTION_ATTRIBUTE   8 (closure)
+               STORE_FAST               8 (cb)
+
+ 153           LOAD_GLOBAL              4 (ctypes)
+               LOAD_ATTR               12 (windll)
+               LOAD_ATTR               14 (user32)
+               LOAD_ATTR               17 (EnumWindows + NULL|self)
+               LOAD_FAST                7 (EnumWindowsProc)
+               PUSH_NULL
+               LOAD_FAST                8 (cb)
+               CALL                     1
+               LOAD_CONST               1 (0)
+               CALL                     2
+               POP_TOP
+
+ 154           LOAD_FAST                4 (cache_ttl)
+               LOAD_CONST               1 (0)
+               COMPARE_OP             148 (bool(>))
+               POP_JUMP_IF_FALSE       25 (to L2)
+
+ 155           LOAD_GLOBAL              0 (time)
+               LOAD_ATTR                0 (time)
+               PUSH_NULL
+               CALL                     0
+               LOAD_FAST                5 (key)
+               LOAD_DEREF               9 (out)
+               LOAD_CONST               6 (('t', 'args', 'result'))
+               BUILD_CONST_KEY_MAP      3
+               STORE_GLOBAL             1 (_find_windows_cache)
+
+ 156   L2:     LOAD_DEREF               9 (out)
+               RETURN_VALUE
+
+Disassembly of <code object cb at 0x000002559E8C1E90, file "env.py", line 124>:
+  --           COPY_FREE_VARS           5
+
+ 124           RESUME                   0
+
+ 125           LOAD_DEREF              12 (visible_only)
+               TO_BOOL
+               POP_JUMP_IF_FALSE       47 (to L1)
+               LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR                7 (IsWindowVisible + NULL|self)
+               LOAD_FAST                0 (hwnd)
+               CALL                     1
+               TO_BOOL
+               POP_JUMP_IF_TRUE         1 (to L1)
+
+ 126           RETURN_CONST             1 (True)
+
+ 127   L1:     LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                8 (create_unicode_buffer)
+               PUSH_NULL
+               LOAD_CONST               2 (1024)
+               CALL                     1
+               STORE_FAST               2 (buf)
+
+ 128           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               11 (GetWindowTextW + NULL|self)
+               LOAD_FAST_LOAD_FAST      2 (hwnd, buf)
+               LOAD_CONST               2 (1024)
+               CALL                     3
+               POP_TOP
+
+ 129           LOAD_FAST                2 (buf)
+               LOAD_ATTR               12 (value)
+               STORE_FAST               3 (title)
+
+ 130           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                8 (create_unicode_buffer)
+               PUSH_NULL
+               LOAD_CONST               3 (256)
+               CALL                     1
+               STORE_FAST               4 (cls)
+
+ 131           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               15 (GetClassNameW + NULL|self)
+               LOAD_FAST_LOAD_FAST      4 (hwnd, cls)
+               LOAD_CONST               3 (256)
+               CALL                     3
+               POP_TOP
+
+ 132           LOAD_FAST                4 (cls)
+               LOAD_ATTR               12 (value)
+               STORE_FAST               5 (class_name)
+
+ 133           LOAD_DEREF              11 (title_match)
+               TO_BOOL
+               POP_JUMP_IF_FALSE        7 (to L2)
+               LOAD_DEREF              11 (title_match)
+               LOAD_FAST                3 (title)
+               CONTAINS_OP              1
+               POP_JUMP_IF_FALSE        1 (to L2)
+
+ 134           RETURN_CONST             1 (True)
+
+ 135   L2:     LOAD_DEREF               8 (class_match)
+               TO_BOOL
+               POP_JUMP_IF_FALSE        7 (to L3)
+               LOAD_DEREF               8 (class_match)
+               LOAD_FAST                5 (class_name)
+               CONTAINS_OP              1
+               POP_JUMP_IF_FALSE        1 (to L3)
+
+ 136           RETURN_CONST             1 (True)
+
+ 137   L3:     LOAD_DEREF              10 (pid)
+               POP_JUMP_IF_NONE       118 (to L4)
+
+ 138           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               16 (wintypes)
+               LOAD_ATTR               19 (DWORD + NULL|self)
+               CALL                     0
+               STORE_FAST               6 (p)
+
+ 139           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               21 (GetWindowThreadProcessId + NULL|self)
+
+ 140           LOAD_FAST                0 (hwnd)
+               LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               22 (byref)
+               PUSH_NULL
+               LOAD_FAST                6 (p)
+               CALL                     1
+
+ 139           CALL                     2
+               POP_TOP
+
+ 141           LOAD_GLOBAL             25 (int + NULL)
+               LOAD_FAST                6 (p)
+               LOAD_ATTR               12 (value)
+               CALL                     1
+               LOAD_DEREF              10 (pid)
+               COMPARE_OP             119 (bool(!=))
+               POP_JUMP_IF_FALSE        1 (to L4)
+
+ 142           RETURN_CONST             1 (True)
+
+ 143   L4:     LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               16 (wintypes)
+               LOAD_ATTR               27 (RECT + NULL|self)
+               CALL                     0
+               STORE_FAST               7 (r)
+
+ 144           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               29 (GetWindowRect + NULL|self)
+               LOAD_FAST                0 (hwnd)
+               LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               22 (byref)
+               PUSH_NULL
+               LOAD_FAST                7 (r)
+               CALL                     1
+               CALL                     2
+               POP_TOP
+
+ 145           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               16 (wintypes)
+               LOAD_ATTR               19 (DWORD + NULL|self)
+               CALL                     0
+               STORE_FAST               6 (p)
+
+ 146           LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR                2 (windll)
+               LOAD_ATTR                4 (user32)
+               LOAD_ATTR               21 (GetWindowThreadProcessId + NULL|self)
+
+ 147           LOAD_FAST                0 (hwnd)
+               LOAD_GLOBAL              0 (ctypes)
+               LOAD_ATTR               22 (byref)
+               PUSH_NULL
+               LOAD_FAST                6 (p)
+               CALL                     1
+
+ 146           CALL                     2
+               POP_TOP
+
+ 148           LOAD_DEREF               9 (out)
+               LOAD_ATTR               31 (append + NULL|self)
+               LOAD_GLOBAL             25 (int + NULL)
+               LOAD_FAST                0 (hwnd)
+               CALL                     1
+               LOAD_FAST_LOAD_FAST     53 (title, class_name)
+
+ 149           LOAD_FAST                7 (r)
+               LOAD_ATTR               32 (left)
+               LOAD_FAST                7 (r)
+               LOAD_ATTR               34 (top)
+               LOAD_FAST                7 (r)
+               LOAD_ATTR               36 (right)
+               LOAD_FAST                7 (r)
+               LOAD_ATTR               38 (bottom)
+               BUILD_LIST               4
+
+ 150           LOAD_GLOBAL             25 (int + NULL)
+               LOAD_FAST                6 (p)
+               LOAD_ATTR               12 (value)
+               CALL                     1
+
+ 148           LOAD_CONST               4 (('hwnd', 'title', 'class', 'rect', 'pid'))
+               BUILD_CONST_KEY_MAP      5
+               CALL                     1
+               POP_TOP
+
+ 151           RETURN_CONST             1 (True)
+
