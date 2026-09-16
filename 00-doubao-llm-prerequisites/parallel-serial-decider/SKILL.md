@@ -86,7 +86,7 @@ description: 并行/串行任务判定与执行调度技能。当需要判断多
 
 ### 日志位置
 
-`F:\自动化验证工具\决策日志\decisions.jsonl`
+`F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\decision-log\decisions.jsonl`
 
 ### 日志格式（每行一条 JSON）
 
@@ -140,12 +140,12 @@ description: 并行/串行任务判定与执行调度技能。当需要判断多
 
 ### 缓存位置
 
-`F:\自动化验证工具\临时缓存\<时间戳>\`
+`F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\temp-cache\<时间戳>\`
 
 目录结构：
 
 ```
-临时缓存/
+temp-cache/
 ├── 20260916_223000/
 │   ├── snapshot/                ← 完整复制
 │   │   ├── 04-implementation/
@@ -329,6 +329,6 @@ description: 并行/串行任务判定与执行调度技能。当需要判断多
 ## 资源
 
 - `scripts/make_cache.py` — 创建临时缓存（snapshot + git_state + manifest.json + restore.ps1）。用法见脚本头部。
-- `scripts/log_decision.py` — 追加一行决策日志到 `F:\自动化验证工具\决策日志\decisions.jsonl`。用法见脚本头部。
-- 决策日志位置：`F:\自动化验证工具\决策日志\decisions.jsonl`
-- 临时缓存位置：`F:\自动化验证工具\临时缓存\<时间戳>\`
+- `scripts/log_decision.py` — 追加一行决策日志到 `F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\decision-log\decisions.jsonl`。用法见脚本头部。
+- 决策日志位置：`F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\decision-log\decisions.jsonl`
+- 临时缓存位置：`F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\temp-cache\<时间戳>\`

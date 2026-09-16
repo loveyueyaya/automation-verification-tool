@@ -8,7 +8,7 @@
 """
 import argparse, datetime, json, os
 
-LOG_FILE = r"F:\自动化验证工具\决策日志\decisions.jsonl"
+LOG_FILE = r"F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\decision-log\decisions.jsonl"
 MAX_BYTES = 10 * 1024 * 1024  # 10MB 滚动
 
 

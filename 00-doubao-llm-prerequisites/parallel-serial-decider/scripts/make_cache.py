@@ -13,7 +13,7 @@
 import argparse, datetime, json, os, shutil, subprocess
 
 ROOT = r"F:\自动化验证工具"
-CACHE_ROOT = os.path.join(ROOT, "临时缓存")
+CACHE_ROOT = os.path.join(ROOT, r"00-doubao-llm-prerequisites\parallel-serial-decider\temp-cache")
 GIT = r"C:\Program Files\Git\cmd\git.exe"
 
 
