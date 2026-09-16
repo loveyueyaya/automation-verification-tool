@@ -1,0 +1,15 @@
+﻿# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+dist/
+build/
+*.spec
+# 日志/临时
+logs/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
