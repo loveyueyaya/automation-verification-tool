@@ -97,6 +97,18 @@ cmd /c "\"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxi
 & "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot\bin\javac.exe" <源文件>.java
 ```
 
+## 阶段封板流程（硬规则）
+
+每阶段（P1/P2/P3…）收尾时必须执行，缺一不可：
+
+1. **打 tag**：`git tag -a "ui-toolbox-P<阶段>-<日期>" -m "<阶段> 说明"`，随后 `git push origin <tag>`。
+2. **准备 RELEASE_NOTES_vX.md**：从阶段文档复制生成，开头写清：Release 名 + 上传时间（精确到秒）、日期、内容、测试结果、已知偏差章节、pyc 备份位置。
+3. **打包资产**：验收证据目录 → `<阶段>_acceptance_evidence.zip`；pyc 备份（如阶段内有重建且 <500MB）→ `<阶段>_pyc_backup.zip`。**资产文件名必须全英文**——中文名会被 gh CLI 截断成 `P1_.zip` 这类坏名。
+4. **发 Release**：`gh release create <tag> --title "<阶段> 标题" --notes-file RELEASE_NOTES_vX.md <资产.zip>...`
+5. **验证**：`gh release view <tag> --json tagName,assets` 确认 Release 存在、资产列表完整。
+
+Release 是"最后保险"：任何代码丢失都可从 Release 资产（证据包 + pyc 备份）+ tag 指向的 commit 恢复。项目代码权威源始终在 `F:\自动化验证工具`，禁止依赖 AppData。
+
 ## 资源
 
 - `scripts/env_check.py` — 输出本机工具链版本与路径（可直接执行）。
