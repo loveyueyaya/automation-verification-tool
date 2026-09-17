@@ -88,6 +88,13 @@ description: "并行/串行任务判定与执行调度技能。当需要判断�
 
 `F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\decision-log\decisions.jsonl`
 
+### 可读镜像 log.txt（供用户手动核查）
+
+- 路径：`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\log.txt`
+- 内容：decisions.jsonl 的**同步副本**（每次写决策日志时自动追加同一行）
+- 用途：用户无需打开 jsonl，直接看 log.txt 即可核查全部决策记录
+- 机制：`scripts/log_decision.py` 写 decisions.jsonl 后同步 append 到 log.txt（滚动时同步重建）
+
 ### 日志格式（每行一条 JSON）
 
 ```json
@@ -99,7 +106,7 @@ description: "并行/串行任务判定与执行调度技能。当需要判断�
   "final_strategy": "serial",
   "reason": "R7 最严格，取串行",
   "cache_created": true,
-  "cache_path": "F:\\自动化验证工具\\临时缓存\\20260916_223000",
+  "cache_path": "F:\\自动化验证工具\\00-doubao-llm-prerequisites\\.user_skills\\cache-manager\\temp-cache\\20260916_223000",
   "result": "success",
   "duration_s": 12.5,
   "notes": ""
@@ -124,63 +131,9 @@ description: "并行/串行任务判定与执行调度技能。当需要判断�
 - 单文件超过 10MB 时归档为 decisions_<日期>.jsonl
 - 保留最近 30 天
 
-## 六、临时缓存机制
+## 六、临时缓存
 
-目的：改错了能一键回滚，不丢代码。
-
-### 触发条件
-
-以下任一命中，执行前必须建缓存：
-- 策略是"谨慎"或"串行"
-- 涉及 git 写操作（commit / push / mv / branch / reset / rebase）
-- 涉及目录重命名、文件移动
-- 涉及改 import / 重构
-- 涉及配置修改
-- 用户要求"安全操作"
-
-### 缓存位置
-
-`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\temp-cache\<时间戳>\`
-
-目录结构：
-
-```
-temp-cache/
-├── 20260916_223000/
-│   ├── snapshot/                ← 完整复制
-│   │   ├── 04-implementation/
-│   │   └── config/
-│   ├── git_state.txt            ← git branch / git log -1 / git status
-│   ├── manifest.json            ← 快照元数据
-│   └── restore.ps1              ← 一键恢复脚本
-```
-
-### manifest.json 格式
-
-```json
-{
-  "ts": "2026-09-16T22:30:00",
-  "task": "改分支名 + 目录重命名",
-  "strategy": "serial",
-  "snapshot_of": ["04-implementation", "config"],
-  "git_branch": "main",
-  "git_commit": "05ab9fc",
-  "restore_cmd": "powershell -File restore.ps1"
-}
-```
-
-### 自动清理
-
-- 成功后：保留 7 天，自动清理
-- 失败后：保留 30 天，防止问题复发
-- 手动清理：用户说"清理缓存"时清空
-
-### 使用场景
-
-1. 操作前：豆包自动建缓存
-2. 操作后：验证通过 → 标记 success
-3. 操作后：验证失败 → 用户说"回滚"，豆包执行 restore.ps1
-4. 回滚后：写决策日志，标记 failed + rollback
+创建/回滚/清理统一见 cache-manager 技能。
 
 ## 七、执行格式（每次任务开始前必须输出）
 
@@ -220,7 +173,7 @@ temp-cache/
 【缓存判定】
 是否需要缓存：是
 缓存理由：命中 R7（改分支名）
-缓存路径：F:\自动化验证工具\临时缓存\20260916_223000\
+缓存路径：F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\cache-manager\temp-cache\20260916_223000\
 
 【日志查询】
 历史同类任务：有（2026-09-15）
@@ -248,13 +201,14 @@ temp-cache/
 
 ## 九、回滚协议
 
+缓存创建、回滚执行（restore.ps1）、清理统一见 cache-manager 技能。本技能只负责回滚后的决策日志记录。
+
 ### 用户说"回滚"时：
 
-1. 读取最近一次缓存的 manifest.json
-2. 执行 restore.ps1
-3. 验证恢复结果（对比 snapshot 与当前状态）
-4. 写决策日志，标记 failed + rollback
-5. 报告：恢复了什么、从哪个时间点
+1. 调用 cache-manager：读取最近一次缓存的 manifest.json，执行 restore.ps1
+2. 验证恢复结果（对比 snapshot 与当前状态）
+3. 写决策日志（log_decision.py），标记 failed + rollback
+4. 报告：恢复了什么、从哪个时间点
 
 ### 用户说"回滚到 N 小时前"时：
 
@@ -322,13 +276,13 @@ temp-cache/
 7. 谨慎/串行任务必须先建临时缓存
 8. 任务完成后立即写决策日志
 9. 用户强制并行时，先警告风险，等确认
-10. 用户说"回滚"时执行 restore.ps1
+10. 用户说"回滚"时调用 cache-manager 执行 restore.ps1
 
 违反任一条，用户有权打回重做。
 
 ## 资源
 
-- `scripts/make_cache.py` — 创建临时缓存（snapshot + git_state + manifest.json + restore.ps1）。用法见脚本头部。
-- `scripts/log_decision.py` — 追加一行决策日志到 `F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\decision-log\decisions.jsonl`。用法见脚本头部。
+- `scripts/log_decision.py` — 追加一行决策日志到 decisions.jsonl **并同步 log.txt**。用法见脚本头部。
 - 决策日志位置：`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\decision-log\decisions.jsonl`
-- 临时缓存位置：`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\temp-cache\<时间戳>\`
+- 决策日志可读镜像（用户核查用）：`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\log.txt`
+- 缓存管理（创建/回滚/清理）：见 **cache-manager** 技能，缓存根 `F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\cache-manager\temp-cache\`

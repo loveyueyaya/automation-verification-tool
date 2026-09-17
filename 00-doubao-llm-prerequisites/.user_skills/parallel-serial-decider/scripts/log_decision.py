@@ -9,6 +9,7 @@
 import argparse, datetime, json, os
 
 LOG_FILE = r"F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\decision-log\decisions.jsonl"
+LOG_TXT = r"F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\log.txt"  # 可读镜像，供用户手动核查
 MAX_BYTES = 10 * 1024 * 1024  # 10MB 滚动
 
 
@@ -46,9 +47,21 @@ def main():
         "duration_s": args.duration_s,
         "notes": args.notes,
     }
+    line = json.dumps(rec, ensure_ascii=False) + "\n"
     with open(LOG_FILE, "a", encoding="utf-8") as f:
-        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+        f.write(line)
+    # 同步追加到 log.txt（可读镜像，供用户手动核查；滚动时同步重建）
+    if os.path.exists(LOG_TXT) and os.path.getsize(LOG_TXT) > MAX_BYTES:
+        archive_txt = LOG_TXT.replace(".txt", "_%s.txt" % datetime.date.today().strftime("%Y%m%d"))
+        os.replace(LOG_TXT, archive_txt)
+        if os.path.exists(LOG_FILE):
+            with open(LOG_FILE, encoding="utf-8") as f:
+                with open(LOG_TXT, "w", encoding="utf-8") as g:
+                    g.write(f.read())
+    with open(LOG_TXT, "a", encoding="utf-8") as f:
+        f.write(line)
     print("决策日志已写入: %s" % LOG_FILE)
+    print("已同步 log.txt: %s" % LOG_TXT)
     print(json.dumps(rec, ensure_ascii=False, indent=2))
 
 
