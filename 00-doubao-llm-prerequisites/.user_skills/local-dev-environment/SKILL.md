@@ -114,6 +114,23 @@ cmd /c "\"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxi
 
 Release 是"最后保险"：任何代码丢失都可从 Release 资产（证据包 + pyc 备份）+ tag 指向的 commit 恢复。项目代码权威源始终在 `F:\自动化验证工具`，禁止依赖 AppData。
 
+## 索引维护（硬规则）
+
+任何新产物产出后（文档新版本 / 技能改动 / 新文件），**必须同步更新对应目录的索引文件**，不留欠账：
+
+| 产物 | 对应索引 |
+|---|---|
+| 需求规格说明书 vX | `F:\自动化验证工具\01-requirements\requirements-index.md` |
+| 技能体系改动（SKILL.md / 脚本 / 新技能） | `F:\自动化验证工具\00-doubao-llm-prerequisites\doubao-prerequisites-index.md` |
+| 技能职责/依赖变化 | `F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\SKILLS_INDEX.md` |
+| 审查日志 | `F:\自动化验证工具\08-review-logs\INDEX.md` |
+| 反馈日志 | `F:\自动化验证工具\09-feedback\feedback-index.md` |
+
+原则：
+- 索引只记录"当前存在的产物 + 一句话职责"，产出后立即更新
+- 描述过期的旧条目必须同步修正（如技能职责变化）
+- 违反 = 索引欠账，视为未完成
+
 ## 资源
 
 - `scripts/env_check.py` — 输出本机工具链版本与路径（可直接执行）。
