@@ -1,6 +1,6 @@
 ---
 name: parallel-serial-decider
-description: 并行/串行任务判定与执行调度技能。当需要判断多个任务能否并行执行、规划执行顺序、确定并行/谨慎/串行三级策略、建立临时缓存、写决策日志、执行回滚时使用。触发场景：任务调度、"能否同时做/一起做"、执行顺序规划、git 写操作前的策略判定、不确定是否可并行、用户要求回滚或清理缓存。
+description: "并行/串行任务判定与执行调度技能。当需要判断多个任务能否并行执行、规划执行顺序、确定并行/谨慎/串行三级策略、建立临时缓存、写决策日志、执行回滚时使用。触发场景：任务调度、执行顺序规划、git 写操作前的策略判定、不确定是否可并行、用户要求回滚或清理缓存。"
 ---
 
 # 并行/串行判定规范 v2.0
@@ -86,7 +86,7 @@ description: 并行/串行任务判定与执行调度技能。当需要判断多
 
 ### 日志位置
 
-`F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\decision-log\decisions.jsonl`
+`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\decision-log\decisions.jsonl`
 
 ### 日志格式（每行一条 JSON）
 
@@ -140,7 +140,7 @@ description: 并行/串行任务判定与执行调度技能。当需要判断多
 
 ### 缓存位置
 
-`F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\temp-cache\<时间戳>\`
+`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\temp-cache\<时间戳>\`
 
 目录结构：
 
@@ -329,6 +329,6 @@ temp-cache/
 ## 资源
 
 - `scripts/make_cache.py` — 创建临时缓存（snapshot + git_state + manifest.json + restore.ps1）。用法见脚本头部。
-- `scripts/log_decision.py` — 追加一行决策日志到 `F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\decision-log\decisions.jsonl`。用法见脚本头部。
-- 决策日志位置：`F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\decision-log\decisions.jsonl`
-- 临时缓存位置：`F:\自动化验证工具\00-doubao-llm-prerequisites\parallel-serial-decider\temp-cache\<时间戳>\`
+- `scripts/log_decision.py` — 追加一行决策日志到 `F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\decision-log\decisions.jsonl`。用法见脚本头部。
+- 决策日志位置：`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\decision-log\decisions.jsonl`
+- 临时缓存位置：`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\temp-cache\<时间戳>\`
