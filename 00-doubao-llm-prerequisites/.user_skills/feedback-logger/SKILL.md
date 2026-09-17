@@ -13,11 +13,11 @@ description: "反馈日志机制技能（三层锚点 + timeline 事件流）。
 - 索引：`F:\自动化验证工具\09-feedback\INDEX.md`
 - 机制说明：`F:\自动化验证工具\09-feedback\feedback-index.md`
 
-## 镜像说明（重要）
+## 加载与备份说明（实测结论 2026-09-17）
 
-- 权威源：`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\feedback-logger\`
-- 镜像：`C:\...\workspace\.skills\feedback-logger\`（复制副本，**不要用 junction**——.skills 系统技能目录会被豆包系统管理，junction 被清理时会连带删除权威源内容，已实测发生）
-- 更新技能时：先改权威源，再复制同步到镜像（保持两份一致）
+- **加载方式**：技能经 AppData `.user_skills` junction → F 盘权威源加载（每轮对话自动注入技能列表，无需手动点击）。权威源即加载源。
+- **`.skills` 系统技能目录不可用于自定义技能镜像**：已实测（2026-09-17）复制镜像后数分钟内被豆包系统清理（108 个官方技能库，系统管理移除非官方内容）；junction 方案更危险（被清理时递归删除权威源内容，曾连带清空本技能权威源，已实测发生）。请勿在 `.skills` 下放置自定义技能。
+- **更新技能**：直接改权威源（`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\feedback-logger\`），junction 自动同步到 AppData，下轮对话生效。
 
 ## 时间戳规则 v3（硬规则）
 
