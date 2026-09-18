@@ -75,17 +75,37 @@ class ShotEngine:
             pass
         return img
 
+    # ---- 区域参数解析：CLI 传 "x,y,w,h"，dxcam 需要 (left, top, right, bottom) ----
+    @staticmethod
+    def _region_box(region):
+        """'x,y,w,h' -> (left, top, right, bottom)；无区域返回 None。"""
+        if not region:
+            return None
+        try:
+            x, y, w, h = [int(v) for v in str(region).split(",")]
+        except Exception:
+            raise ValueError("region 格式应为 x,y,w,h，实际: %s" % region)
+        if w <= 0 or h <= 0:
+            raise ValueError("region 宽高必须为正数，实际: %s" % region)
+        return (x, y, x + w, y + h)
+
     # ---- dxcam（DXGI Desktop Duplication）----
-    def _try_dxcam(self):
+    def _try_dxcam(self, region=None):
         if self._dx is None:
             import dxcam
             self._dx = dxcam.create(output_idx=self.monitor,
                                     output_color=self.output_color)
-        img = self._dx.grab()
+        box = self._region_box(region)
+        # BUG-1 修复：此前此处恒为 self._dx.grab()，导致 --region 被静默丢弃
+        img = self._dx.grab(region=box) if box else self._dx.grab()
+        if img is None:
+            # dxcam 在无新帧时返回 None；截图工具需要的是"当前画面"，
+            # 交由上层降级到 mss（GDI）取帧，保证调用方始终拿到图像。
+            raise RuntimeError("dxcam 未返回新帧（None）")
         return img
 
     # ---- mss（GDI 兜底）----
-    def _try_mss(self):
+    def _try_mss(self, region=None):
         if self._mss is None:
             import mss
             self._mss = mss.mss()
@@ -97,7 +117,13 @@ class ShotEngine:
         img = np.asarray(shot)[:, :, :3]
         if self.output_color == "RGB":
             img = img[:, :, ::-1]
-        return np.ascontiguousarray(img)
+        img = np.ascontiguousarray(img)
+        box = self._region_box(region)
+        if box:
+            # mss 无原生区域参数，按虚拟屏幕坐标裁剪（与 dxcam 行为对齐）
+            left, top, right, bottom = box
+            img = img[top:bottom, left:right]
+        return img
 
     def grab(self, region=None):
         """WGC 优先；FORCE_WGC=1 时 WGC 失败直接抛错，绝不降级。"""
@@ -110,11 +136,11 @@ class ShotEngine:
                 if FORCE_WGC:
                     raise RuntimeError("强制 WGC 模式失败，禁止降级: %s" % e)
         try:
-            return self._try_dxcam()
+            return self._try_dxcam(region)
         except Exception as e:
             errors.append("dxcam(%s)" % e)
             try:
-                return self._try_mss()
+                return self._try_mss(region)
             except Exception as e2:
                 raise RuntimeError("截图引擎全部失败: %s / mss(%s)"
                                    % (" / ".join(errors), e2))

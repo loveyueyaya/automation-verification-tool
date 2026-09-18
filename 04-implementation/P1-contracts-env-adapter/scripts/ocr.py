@@ -16,30 +16,72 @@ import argparse
 import json
 import os
 import sys
+import threading
+
+
+def _gpu_total_mb():
+    """用 NVIDIA 官方 pynvml 原生 API 读取显存总量（替代 subprocess 调 nvidia-smi）。
+
+    优势：无进程启动开销（nvidia-smi 实测 151.79 ms/次），无需缓存，
+    失败时回退默认值 12288 MiB。
+    """
+    try:
+        import ctypes
+        import pynvml
+        # Windows 兼容：pynvml 默认只到 %ProgramFiles%/NVIDIA Corporation/NVSMI/nvml.dll 找库，
+        # 部分机器（如本机）nvml.dll 仅存在于 System32，此处先按候选路径预加载。
+        if getattr(pynvml, "nvmlLib", None) is None:
+            cands = [
+                os.path.join(os.getenv("ProgramFiles", "C:/Program Files"),
+                             "NVIDIA Corporation", "NVSMI", "nvml.dll"),
+                "nvml.dll",
+            ]
+            for cand in cands:
+                try:
+                    pynvml.nvmlLib = ctypes.CDLL(cand)
+                    break
+                except OSError:
+                    continue
+        pynvml.nvmlInit()
+        try:
+            handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+            info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+            return int(info.total / 1024 / 1024)
+        finally:
+            try:
+                pynvml.nvmlShutdown()
+            except Exception:
+                pass
+    except Exception:
+        return 12288
 
 
 def _setup_gpu(mem_ratio=0.8):
     """在 import paddle 前设置显存上限（80%）与分配策略。"""
-    import ctypes
-    try:
-        ctypes.windll.nvapi.nvapi_QueryInterface  # noqa 确保 nvapi 存在与否不影响
-    except Exception:
-        pass
-    # 探测显存：用 paddle 前先用 nvidia-smi（无额外依赖）
-    try:
-        import subprocess
-        out = subprocess.run(
-            ["nvidia-smi", "--query-gpu=memory.total",
-             "--format=csv,noheader,nounits"],
-            capture_output=True, text=True, timeout=5).stdout.strip().splitlines()
-        total_mb = int(out[0].split()[0]) if out else 12288
-    except Exception:
-        total_mb = 12288
+    total_mb = _gpu_total_mb()
     limit = int(total_mb * mem_ratio)
     os.environ.setdefault("FLAGS_gpu_memory_limit_mb", str(limit))
     os.environ.setdefault("FLAGS_allocator_strategy", "auto_growth")
     os.environ.setdefault("FLAGS_use_pinned_memory", "true")
     return total_mb, limit
+
+
+_OCR_LOCK = threading.Lock()
+_OCR = None
+
+
+def get_ocr(lang="ch", gpu=True):
+    """模块级单例：PaddleOCR 只初始化一次，后续调用直接复用（BUG-3 修复）。
+
+    背景：PaddleOCR 初始化实测约 8.9 秒（模型加载），此前每次调用都重新
+    load_ocr()，导致单次 OCR 端到端高达 10.9 秒。
+    """
+    global _OCR
+    if _OCR is None:
+        with _OCR_LOCK:
+            if _OCR is None:
+                _OCR = load_ocr(lang=lang, gpu=gpu)
+    return _OCR
 
 
 def load_ocr(lang="ch", gpu=True):
@@ -114,7 +156,7 @@ def main():
     args = ap.parse_args()
 
     if args.serve:
-        ocr = load_ocr(gpu=args.gpu)
+        ocr = get_ocr(gpu=args.gpu)
         print(json.dumps({"ready": True,
                           "gpu": getattr(ocr, "_gpu_total", None),
                           "limit_mb": getattr(ocr, "_gpu_limit", None)}),
@@ -136,7 +178,7 @@ def main():
     if not args.image:
         print(json.dumps({"ok": False, "error": "需要 --image"}), flush=True)
         return
-    ocr = load_ocr(gpu=args.gpu)
+    ocr = get_ocr(gpu=args.gpu)
     items = recognize(ocr, args.image, args.region, args.filter)
     print(json.dumps({"ok": True, "count": len(items), "items": items},
                      ensure_ascii=False))
