@@ -223,3 +223,10 @@ logs/
 .DS_Store
 Thumbs.db
 
+
+# AI 平台工作目录（项目级 memory，非项目内容）
+.workbuddy/
+
+# 环境快照的临时中间产物（保留正式快照）
+08-env-baseline/*.tmp
+08-env-baseline/*.log

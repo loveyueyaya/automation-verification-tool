@@ -234,3 +234,17 @@ env_adapter/
 2. **test_rebuild_equiv.py 验证的是"重建版行为自洽"，不是"与原始版等价"**：真正的等价性证明需要原始版可运行，但原始版存在 LRESULT bug，无法运行。等价性仅以"差异逐项归因"作逻辑论证（详见 7.1 / 6.1）。
 3. **ocr.py / sendinput.py 的"F 盘权威"是时间线事实**：功能升级早于 P1（06:53 桌面迭代期），P1 仅随迁；无单测、有真机冒烟；与 P1 契约化无冲突；不标"P1 越界实现"，标"P1 范围外运行依赖，P2 统一对齐"（详见 7.6）。
 
+## 8. 历史修复记录（2026-09-18 补记）
+
+> 记录"为什么这么写"的关键上下文，避免后人重写时踩坑。
+
+| 修复项 | 位置 | 说明 |
+|---|---|---|
+| ctypes 指针截断 | `scripts/sendinput.py::to_clipboard` | `SetClipboardData` 等 API 显式设置 `restype=c_void_p`（windll 默认截断为 32 位，句柄会出错） |
+
+补充说明（2026-09-18 核实）：
+
+- `to_clipboard` 完整调用链：`OpenClipboard → EmptyClipboard → GlobalAlloc(0x0042) → GlobalLock → memmove → GlobalUnlock → SetClipboardData(CF_UNICODETEXT=13) → CloseClipboard`；数据 UTF-16LE 编码，剪贴板被占用时重试 3 次。
+- 指针截断修复覆盖：`kernel32.GlobalAlloc / GlobalLock / GlobalSize` 的 `restype`，以及 `user32.SetClipboardData` 的 `argtypes` / `restype`。
+- 该实现**不依赖 pyperclip，也不依赖 pywin32 的 win32clipboard**，纯 ctypes + user32/kernel32（实测：干净进程 import sendinput，`pyperclip` 不在 `sys.modules`）。
+
