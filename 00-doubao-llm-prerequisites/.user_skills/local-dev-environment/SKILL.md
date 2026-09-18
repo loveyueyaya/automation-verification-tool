@@ -24,7 +24,7 @@ parallel-serial-decider 技能（R1-R23 完整版 v2.0）。
 ## 平台实测坑（2026-09-18 本机实测，写代码/跑命令前必读）
 
 > 全部为本机实测结论（含退出码与报错原文），避免每轮新会话重复踩坑。
-> 完整地基清单见 `F:\自动化验证工具\06-deployment\env-baseline_v1.md`。
+> 完整地基清单见 `F:\自动化验证工具\10-env-baseline\env-baseline_v1.md`。
 
 ### 坑 A：PowerShell 工具 stdout 不回传
 

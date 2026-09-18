@@ -228,5 +228,12 @@ Thumbs.db
 .workbuddy/
 
 # 环境快照的临时中间产物（保留正式快照）
-08-env-baseline/*.tmp
-08-env-baseline/*.log
+10-env-baseline/*.tmp
+10-env-baseline/*.log
+
+# 临时交接文档（不入库）
+HANDOVER.md
+
+# 已在 GitHub Release 的本地副本（不入库）
+P1_acceptance_evidence.zip
+P1_patch1_release_notes.md

@@ -11,7 +11,7 @@
 | # | 修订内容 | 对应意见 |
 |---|---|---|
 | 1 | 卸载 pyautogui 及 8 个污染依赖，重跑 56 测试确认全绿 | 问题 1 |
-| 2 | 回滚快照另存 F 盘 `08-env-baseline\pip_before_20260918.txt`，本节路径已更新 | 问题 2 |
+| 2 | 回滚快照另存 F 盘 `10-env-baseline\pip_before_20260918.txt`，本节路径已更新 | 问题 2 |
 | 3 | 新增第十节「P2-2 迁移顺序（修正版 7 步）」，撤销原"git mv + shim"错误顺序 | 问题 3 |
 | 4 | 新增第八节：P1 `env_probe` 的 Windows API 调用方式澄清（ctypes，非 pywin32） | 澄清 1 |
 | 5 | 新增第九节：56 测试全绿的三个时点，明确"补装后仍全绿" | 澄清 2 |
@@ -169,7 +169,7 @@ cd "/f/自动化验证工具/04-implementation/P1-contracts-env-adapter"
 ## 七、回滚依据
 
 - 安装前全量快照（**已另存 F 盘**）：
-  - 路径：`F:\自动化验证工具\08-env-baseline\pip_before_20260918.txt`
+  - 路径：`F:\自动化验证工具\10-env-baseline\pip_before_20260918.txt`
   - 行数 **106**，字节 **2348**，sha256 `a9ea9fdaffbbfdb815efe5a41cc090e6a5291900d64b3aaf8c34e29dcc8500ec`
 - 回滚方式：按该快照对比当前版本；对保留包执行
   `pip uninstall -y pywin32 pywinauto uiautomation`，地基包版本以 3.1 节为准。
@@ -263,7 +263,7 @@ cd "/f/自动化验证工具/04-implementation/P1-contracts-env-adapter"
 1. `cl.exe`（MSVC）未入 PATH —— 需编译 C++ 扩展时先跑 `vcvars64.bat`，不影响当前纯 Python 阶段。
 2. 本机 `security=wujie` 导致 `focus_reliable=False` —— UI 自动化实测前建议关闭远程控制软件。
 3. 下一步按用户指令执行 P2-2，**严格按第十节 7 步顺序**，第 1 步动手前先建可回滚缓存。
-4. `.workbuddy/` 目录目前是 git 未跟踪状态，提交前需决定加入 `.gitignore` 还是随仓库提交。
+4. `.workbuddy/`（项目级 memory）与 3 个旧资产（`HANDOVER.md` / `P1_acceptance_evidence.zip` / `P1_patch1_release_notes.md`）已于 2026-09-18 加入 `.gitignore`，不再出现在 untracked 列表。
 
 ---
 

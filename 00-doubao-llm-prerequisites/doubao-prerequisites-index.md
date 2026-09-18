@@ -18,4 +18,4 @@
 - AppData 侧 `.user_skills` 是本目录的 junction 符号链接（同一份文件，C 盘跳转 F 盘）——**这是豆包实际加载技能的目录，每轮对话自动注入**
 - **`.skills` 系统技能目录（108 个官方技能）会被系统清理非官方内容，不可用于自定义技能镜像**（2026-09-17 实测：复制镜像数分钟内被清；junction 更危险，被清时递归删除权威源）
 - local-dev-environment/SKILL.md 含"阶段封板流程"与"索引维护"硬规则；并行/串行判定统一见 parallel-serial-decider（v2.0 不再内嵌）
-- 环境地基清单：`F:\自动化验证工具\06-deployment\env-baseline_v1.md`（硬件/工具链/包版本/可复现安装命令/验收证据/P2-2 迁移顺序修正版 7 步）；安装前 pip 快照：`F:\自动化验证工具\08-env-baseline\pip_before_20260918.txt`
+- 环境地基清单：`F:\自动化验证工具\10-env-baseline\env-baseline_v1.md`（硬件/工具链/包版本/可复现安装命令/验收证据/P2-2 迁移顺序修正版 7 步）；安装前 pip 快照：`F:\自动化验证工具\10-env-baseline\pip_before_20260918.txt`
