@@ -248,3 +248,50 @@ env_adapter/
 - 指针截断修复覆盖：`kernel32.GlobalAlloc / GlobalLock / GlobalSize` 的 `restype`，以及 `user32.SetClipboardData` 的 `argtypes` / `restype`。
 - 该实现**不依赖 pyperclip，也不依赖 pywin32 的 win32clipboard**，纯 ctypes + user32/kernel32（实测：干净进程 import sendinput，`pyperclip` 不在 `sys.modules`）。
 
+## 9. P2-2 迁移记录（2026-09-19）
+
+> 依据：《架构设计 v3.2》方案 B + `10-env-baseline/env-baseline_v1.md` 第十节「P2-2 迁移顺序（修正版 7 步）」。
+> commit：`1ae52c5`
+
+### 9.1 本次完成的动作
+
+| 步 | 动作 | 实测结果 |
+|---|---|---|
+| 1 | 复制 contracts 到 `04-implementation/P2-layers/contracts`（P1 不动） | 9 个文件落盘 |
+| 2 | 逐文件 diff 校验 | 9/9 IDENTICAL |
+| 3 | P1 `contracts/__init__.py` 改为 shim | `contracts.__file__` → `P2-layers/contracts/__init__.py` |
+| 4 | 跑 56 测试 | `Ran 56 tests in 0.411s / OK` |
+| 6 | 用 `git mv -f` 把 8 个具体模块迁入 P2-layers，P1 只留 shim | 双份消除，56 测试仍 OK |
+| 附 | `git mv` env_adapter 整目录 → `P2-layers/env_adapter` | 零引用，无需 shim |
+
+`state_hash.py` / `stable_id.py` / `models.py` / `enums.py` 按架构 v3.2 必修 1 **留在 contracts 横切区**，未下放到 planning/execution 层。
+
+### 9.2 shim 实现方式（为什么不是 `from ... import *`）
+
+目录名 `P2-layers` 含连字符，不能作为包名 import，因此 shim 采用
+`importlib.util.spec_from_file_location(name, new_init, submodule_search_locations=[new_dir])`
+构造新包并**整体替换 `sys.modules['contracts']`**。好处：子模块（`contracts.enums`、
+`contracts.state_hash`）也一并从新目录解析，`from contracts.state_hash import state_hash`
+这类"父包属性被子模块同名函数遮蔽"的写法照旧可用。CPython 的 `importlib._bootstrap._InstalledSafely`
+注释明确支持这种 sys.modules 替换写法。
+
+### 9.3 环境事故（必读）
+
+- 现象：执行 `git rm` 批量删除 8 个契约模块后，**`04-implementation/P1-contracts-env-adapter/`
+  整个目录被外部删除**（两次复现，含 scripts / tests / 证据 / MIGRATION.md），
+  随后未入库的 `P2-layers/` 与已入库的 `implementation-index.md` 也一度消失。
+- 处置：全部用 `git reset` + `git checkout -- <path>` 恢复（HEAD `a0aeccc` 完整）；
+  P2-1 未提交的 shot.py / ocr.py 修复由回滚缓存
+  `C:\Users\Administrator\.workbuddy\skills\cache-manager\temp-cache\20260919_030131` 补回。
+- 结论：**本环境下 `git rm` 会触发目录级丢失，改用 `git mv` 未复现**。
+  后续删除类操作一律先 `git add` 入对象库再动手，并优先用 `git mv`。
+- 与 2026-09-19 早些时候"nvidia CUDA DLL / modelscope_hub / colorama 反复丢失"
+  疑为同一环境侧问题，根因仍未定位（无 hooks 配置、非磁盘空间）。
+
+### 9.4 遗留（不在本次范围）
+
+- 第 5 步（逐脚本改 import 到新路径）与第 7 步（删 shim）：
+  需先给 3 个脚本 + 4 个测试文件加 `P2-layers` 的 `sys.path` 引导，
+  与"scripts 按层迁入 perception / execution / observability"同批做，避免重复改动。
+- BUG-2（env_adapter 零引用）与 BUG-4（framework 误判）仍未处理。
+
