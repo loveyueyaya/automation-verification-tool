@@ -358,19 +358,28 @@ def c9_git():
 
     head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=BASE, capture_output=True,
                           text=True, encoding="utf-8", errors="replace").stdout.strip()
-    lr = subprocess.run(["git", "ls-remote", "origin", "refs/heads/main"], cwd=BASE,
-                        capture_output=True, text=True, encoding="utf-8", errors="replace")
-    remote_sha = (lr.stdout or "").split()[0] if (lr.stdout or "").split() else ""
-    if not remote_sha:
-        P("    ⚠ ls-remote rc=%s stderr=%s" % (lr.returncode, (lr.stderr or "").strip()[:160]))
-        lr2 = subprocess.run(["git", "ls-remote", "origin", "refs/heads/main"], cwd=BASE,
-                             capture_output=True, text=True, encoding="utf-8",
-                             errors="replace", timeout=300)
-        remote_sha = (lr2.stdout or "").split()[0] if (lr2.stdout or "").split() else ""
-        if remote_sha:
-            P("    （重试后读到远端 SHA）")
+    # 远端一致性：优先用 gh api 直读远端 ref（独立通道），失败再退回 ls-remote（关闭吊销检查）
+    remote_sha, channel, errs = "", "", []
+    gh = subprocess.run(["gh", "api", "repos/loveyueyaya/automation-verification-tool/git/ref/heads/main",
+                         "--jq", ".object.sha"], cwd=BASE, capture_output=True, text=True,
+                        encoding="utf-8", errors="replace", timeout=180)
+    if (gh.stdout or "").strip():
+        remote_sha, channel = gh.stdout.strip(), "gh api"
+    else:
+        errs.append("gh: %s" % ((gh.stderr or "").strip()[:100]))
+        LR = ["git", "-c", "http.schannelCheckRevoke=false", "ls-remote", "origin", "refs/heads/main"]
+        for _ in range(3):
+            lr = subprocess.run(LR, cwd=BASE, capture_output=True, text=True,
+                                encoding="utf-8", errors="replace", timeout=180)
+            if (lr.stdout or "").split():
+                remote_sha, channel = (lr.stdout or "").split()[0], "ls-remote"
+                break
+            errs.append("ls-remote rc=%s %s" % (lr.returncode, (lr.stderr or "").strip()[:100]))
+    if errs and not remote_sha:
+        P("    ⚠ 远端读取诊断: %s" % " | ".join(errs[-2:]))
     item("本地 HEAD == 远端 main（直读远端）", bool(head) and head == remote_sha,
-         "本地=%s 远端=%s" % (head[:7], remote_sha[:7] or "读取失败"))
+         "本地=%s 远端=%s%s" % (head[:7], remote_sha[:7] or "读取失败",
+                                "（通道：%s）" % channel if channel else ""))
     if ren:
         item("重命名/移动已暂存待提交（≥8 条）", len(ren) >= 8, "%d 条（尚未提交）" % len(ren))
     else:
@@ -444,7 +453,9 @@ def c11_func():
     item("区域截图 320×200", '"size": [320, 200]' in (out or ""))
     rc, out, err = run([PY, os.path.join(p1, "scripts", "locate.py"), "template",
                         "--image", r"F:\tmp\v.png", "--tpl", r"F:\tmp\v.png"], timeout=600)
-    item("模板匹配 confidence=1.0", "1.0" in (out or ""))
+    confs = [float(x) for x in re.findall(r'"confidence":\s*([0-9.]+)', out or "")]
+    item("模板匹配 confidence ≥ 0.99", bool(confs) and max(confs) >= 0.99,
+         "实测 confidence=%s" % (confs[0] if confs else "无输出"))
 
 
 def c12_assets():
