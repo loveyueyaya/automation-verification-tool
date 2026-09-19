@@ -28,7 +28,25 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import env
 
+# P2-3 单源化：键名↔VK 映射取自 core.utils（此前仅测试控制台有一份，sendinput 只认数字）
+# append 到路径末尾，不抢任何解析优先级；core 不可用时降级为纯数字解析，行为不变。
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))), "P2-layers"))
+try:
+    from core.utils import vk_of as _vk_of
+except Exception:                                     # pragma: no cover
+    _vk_of = None
+
 env.set_dpi_awareness()
+
+
+def _vk(x):
+    """键名或 VK 数字 → VK：支持 "F10" / "insert" / "A" / "0x79" / "121"。"""
+    if _vk_of is not None:
+        v = _vk_of(x)
+        if v is not None:
+            return v
+    return int(str(x), 0)                             # 回退：保持原有数字/0x 解析
 
 # ---------- SendInput 结构 ----------
 INPUT_MOUSE = 0
@@ -216,6 +234,8 @@ def main():
                                     "msgchar"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--pct", action="store_true", help="坐标用千分比")
+    ap.add_argument("--trace-id", default=None,
+                    help="跨进程 trace 透传（P2-3）：由 uitool 注入，本脚本只接收不影响行为")
     a = ap.parse_args()
 
     def P(x, y):
@@ -236,9 +256,9 @@ def main():
     elif a.cmd == "type":
         type_ascii(a.args[0])
     elif a.cmd == "key":
-        key(int(a.args[0], 0))
+        key(_vk(a.args[0]))                            # 支持键名（F10/insert）与数字（0x79/121）
     elif a.cmd == "hotkey":
-        hotkey([int(v, 0) for v in a.args[0].split(",")])
+        hotkey([_vk(v) for v in a.args[0].split(",")])
     elif a.cmd == "clip":
         to_clipboard(" ".join(a.args))
     elif a.cmd == "paste":

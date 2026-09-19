@@ -53,11 +53,16 @@ class Timeline:
         self.step = 0
 
     def record(self, phase, action, target="", method="", result="ok",
-               note="", latency_ms=None, src=None, conf=None, chain=None):
+               note="", latency_ms=None, src=None, conf=None, chain=None,
+               trace_id=None, span_id=None, parent_span=None):
         """记录事件。审计归因字段：
         src   坐标/目标来源: handle|template|ocr|rule|manual|diagnose
         conf  置信度 0-1（manual 恒记 1 但注明来源，便于审计）
-        chain 回退链/诊断链: ["handle","ocr"] 或 ["focus","coords","retry"]"""
+        chain 回退链/诊断链: ["handle","ocr"] 或 ["focus","coords","retry"]
+
+        P2-3 跨进程 trace：trace_id / span_id / parent_span 三元组为可选字段，
+        不传时事件结构与 P1/P2-2 完全一致（向后兼容，旧 timeline.jsonl 不受影响）。
+        """
         self.step += 1
         ev = {
             "ts": now_iso(),
@@ -74,6 +79,13 @@ class Timeline:
             "chain": chain or [],
             "note": note,
         }
+        # 仅当调用方显式传入时才落盘，保证不传 trace 的场景输出结构不变
+        if trace_id is not None:
+            ev["trace_id"] = trace_id
+        if span_id is not None:
+            ev["span_id"] = span_id
+        if parent_span is not None:
+            ev["parent_span"] = parent_span
         with open(self.jsonl, "a", encoding="utf-8") as f:
             f.write(json.dumps(ev, ensure_ascii=False) + "\n")
         self._last_pc = _pc()

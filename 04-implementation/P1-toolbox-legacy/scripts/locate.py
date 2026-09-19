@@ -29,20 +29,15 @@ if os.environ.get("UITOOL_CONTRACTS_SOURCE", "p2").strip().lower() == "p1":
     sys.path.insert(0, _IMPL)                               # p1 模式：经 P1 目录 contracts shim（需先运行 restore_p1_shim.py）
 else:
     sys.path.insert(0, os.path.join(_IMPL_ROOT, "P2-layers"))  # 默认：契约层唯一实现
+sys.path.append(os.path.join(_IMPL_ROOT, "P2-layers"))        # core 包：append 到末尾，不抢 contracts 解析优先级（p1/p2 两种模式都能用）
 import env
 import cache as cache_mod
 from contracts import SourceEnum
+from core.utils import jdefault   # P2-3 单源化：取代本文件原 _jdefault（与 uitool 那份重复且已漂移）
 
 env.set_dpi_awareness()
 PY = sys.executable
 SCRIPTS = os.path.dirname(os.path.abspath(__file__))
-
-
-def _jdefault(o):
-    """JSON 序列化：枚举 → value；未知对象 → str。"""
-    if isinstance(o, Enum):
-        return o.value
-    return str(o)
 
 
 def _run_ocr(image, text=None, region=None):
@@ -161,20 +156,20 @@ def main():
 
     if a.cmd == "ocr":
         print(json.dumps(loc_by_ocr(a.image, a.text, a.region),
-                         ensure_ascii=False, default=_jdefault))
+                         ensure_ascii=False, default=jdefault))
     elif a.cmd == "handle":
         print(json.dumps(loc_by_handle(a.title, a.cls),
-                         ensure_ascii=False, default=_jdefault))
+                         ensure_ascii=False, default=jdefault))
     elif a.cmd == "template":
         print(json.dumps(loc_by_template(a.tpl, a.image, a.threshold),
-                         ensure_ascii=False, default=_jdefault))
+                         ensure_ascii=False, default=jdefault))
     elif a.cmd == "all":
         print(json.dumps(loc_all(a.image, a.text, a.title, a.cls, a.tpl),
-                         ensure_ascii=False, default=_jdefault))
+                         ensure_ascii=False, default=jdefault))
     elif a.cmd == "verify":
         # verify --image img1 --tpl img2 (复用参数位传第二图)
         print(json.dumps(verify_region(a.image, a.tpl, a.region),
-                         ensure_ascii=False, default=_jdefault))
+                         ensure_ascii=False, default=jdefault))
 
 
 if __name__ == "__main__":

@@ -18,6 +18,11 @@ class TraceSpan:
     ts_start: float
     ts_end: float
     meta: dict = field(default_factory=dict)
+    # P2-3 补：跨进程 span 三元组（trace_id / span_id / parent_span）。
+    # 向后兼容约定：新字段一律带默认值且置于末尾，旧位置参数构造方式保持不变；
+    # span_id 为空串表示"未启用 span"，parent_span 为空串表示根 span（孤儿 span 检测据此判定）。
+    span_id: str = ""
+    parent_span: str = ""
 
     @property
     def duration_ms(self) -> float:

@@ -29,6 +29,7 @@ import os
 import subprocess
 import sys
 import time
+import uuid
 from enum import Enum
 
 # --- contracts 来源引导（P2-2 收尾 #1；feature flag 说明见 restore_p1_shim.py） ---
@@ -40,11 +41,13 @@ if os.environ.get("UITOOL_CONTRACTS_SOURCE", "p2").strip().lower() == "p1":
     sys.path.insert(0, _IMPL)                               # p1 模式：经 P1 目录 contracts shim（需先运行 restore_p1_shim.py）
 else:
     sys.path.insert(0, os.path.join(_IMPL_ROOT, "P2-layers"))  # 默认：契约层唯一实现
+sys.path.append(os.path.join(_IMPL_ROOT, "P2-layers"))        # core 包：append 到末尾，不抢 contracts 解析优先级（p1/p2 两种模式都能用）
 import env
 import shot as shot_mod
 import locate as locate_mod
 import timeline as tl
 from contracts import SourceEnum
+from core.utils import jdefault   # P2-3 单源化：取代本文件原 _jdefault（与 locate 那份重复且已漂移）
 
 PY = sys.executable
 SCRIPTS = os.path.dirname(os.path.abspath(__file__))
@@ -59,12 +62,6 @@ def _v(x):
     return x
 
 
-def _jdefault(o):
-    if isinstance(o, Enum):
-        return o.value
-    return str(o)
-
-
 def new_session(name=None):
     if not name:
         name = time.strftime("session_%Y%m%d_%H%M%S")
@@ -73,9 +70,48 @@ def new_session(name=None):
     return d, name
 
 
-def _sub(args):
-    r = subprocess.run([PY, os.path.join(SCRIPTS, args[0])] + args[1:],
-                       capture_output=True, text=True, timeout=300)
+# ---------- P2-3 跨进程 trace ----------
+_TRACE_TARGETS = {"sendinput.py", "ocr.py"}      # 已支持 --trace-id 的子脚本
+_TRACE_ID = None                                  # 本次执行的 trace_id
+_TRACE_SEQ = 0
+_TL = None                                        # 当前 Timeline（由 _tl() 登记）
+
+
+def set_trace(tid=None):
+    """设置/生成本次执行的 trace_id（不传则自动生成）。返回 trace_id。"""
+    global _TRACE_ID, _TRACE_SEQ
+    _TRACE_SEQ = 0
+    _TRACE_ID = tid or ("t-%s" % uuid.uuid4().hex[:12])
+    return _TRACE_ID
+
+
+def _tl(session):
+    """创建 Timeline 并登记为当前 trace 记录目标（供 _sub 写 span 三元组）。
+
+    P2-3：每次命令执行以一条根 span（<trace_id>-s0）开始，后续每个子进程调用
+    生成一个子 span（s1/s2/...，parent 指向根 span），形成"根 → 子进程"的父子链。
+    """
+    global _TL
+    _TL = tl.Timeline(session)
+    if _TRACE_ID:
+        _TL.record("trace", "root", target=str(session), result="start",
+                   trace_id=_TRACE_ID, span_id="%s-s0" % _TRACE_ID)
+    return _TL
+
+
+def _sub(args, parent_span=None):
+    cmd = [PY, os.path.join(SCRIPTS, args[0])] + args[1:]
+    if _TRACE_ID and args[0] in _TRACE_TARGETS:
+        global _TRACE_SEQ
+        _TRACE_SEQ += 1
+        span = "%s-s%d" % (_TRACE_ID, _TRACE_SEQ)
+        cmd += ["--trace-id", _TRACE_ID]
+        if _TL is not None:
+            _TL.record("trace", "subprocess", target=args[0],
+                       method=" ".join(str(x) for x in args[1:])[:80],
+                       result="spawn", trace_id=_TRACE_ID, span_id=span,
+                       parent_span=parent_span or ("%s-s0" % _TRACE_ID))
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     out = r.stdout.strip()
     try:
         return json.loads(out.splitlines()[-1]) if out else {}
@@ -85,7 +121,7 @@ def _sub(args):
 
 def see(session, label="", title=None, cls=None):
     """感知层：全屏截图 + 窗口状态 + 按规则自选 target_hwnd（不猜）。"""
-    t = tl.Timeline(session)
+    t = _tl(session)
     shot_path = os.path.join(session, "shots", "see_%s.png" % label)
     eng = shot_mod.get_engine()
     from PIL import Image
@@ -209,7 +245,7 @@ def _diagnose_quick(loc):
 def auto_click(session, text, hwnd, force_xy, title, cls, expect,
                retries=3, label=""):
     """动作层闭环：定位 → 点击 → 期望验证 → 失败诊断 → 修复 → 重试。"""
-    t = tl.Timeline(session)
+    t = _tl(session)
     chain = []
     last_diag = None
     for attempt in range(1, retries + 1):
@@ -275,7 +311,7 @@ def auto_click(session, text, hwnd, force_xy, title, cls, expect,
 
 def click(session, x, y, dbl=False, label=""):
     """旧接口保留（内部仍走时间线；来源由调用方显式声明）。"""
-    t = tl.Timeline(session)
+    t = _tl(session)
     t.record("click", "dblclick" if dbl else "click", "%d,%d" % (x, y),
              method="sendinput", src=SourceEnum.MANUAL, conf=1.0,
              chain=[SourceEnum.MANUAL.value])
@@ -289,7 +325,7 @@ def click(session, x, y, dbl=False, label=""):
 
 
 def paste(session, x, y, text, src=None):
-    t = tl.Timeline(session)
+    t = _tl(session)
     t.record("click", "paste", "%d,%d %s" % (x, y, text[:20]),
              method="clipboard+ctrl+v", src=src, conf=1.0,
              chain=[_v(src)])
@@ -303,7 +339,7 @@ def paste(session, x, y, text, src=None):
 
 def verify_text(session, text, region=None):
     """验证：全屏截图 → OCR 找文本（界面是否出现期望状态）。"""
-    t = tl.Timeline(session)
+    t = _tl(session)
     shot_path = os.path.join(session, "shots", "verify.png")
     eng = shot_mod.get_engine()
     from PIL import Image
@@ -346,13 +382,16 @@ def main():
     ap.add_argument("--expect", default=None,
                     help="闭环：点击后期望出现的文本（未命中→诊断→重试）")
     ap.add_argument("--retries", type=int, default=3)
+    ap.add_argument("--trace-id", default=None,
+                    help="跨进程 trace（P2-3）：不传则自动生成；同一业务流程的多次调用传同一个 id 可串成一条链")
     a = ap.parse_args()
+    set_trace(a.trace_id)          # P2-3：确定本次执行的 trace_id（不传则自动生成）
 
     session, name = (new_session(a.session)
                      if a.cmd != "report" else (a.session, a.session))
     if a.cmd == "see":
         r = see(session, a.label, a.title, a.cls)
-        print(json.dumps(r, ensure_ascii=False, default=_jdefault))
+        print(json.dumps(r, ensure_ascii=False, default=jdefault))
     elif a.cmd == "click":
         force_xy = None
         if a.force_xy:
@@ -373,7 +412,7 @@ def main():
             return
         r = auto_click(session, a.by_locate, a.hwnd, force_xy,
                        a.title, a.cls, a.expect, a.retries, a.label)
-        print(json.dumps(r, ensure_ascii=False, default=_jdefault))
+        print(json.dumps(r, ensure_ascii=False, default=jdefault))
     elif a.cmd == "dblclick":
         if a.args and len(a.args) >= 2 \
                 and not (a.by_locate or a.hwnd or a.force_xy):
@@ -387,7 +426,7 @@ def main():
             force_xy = (int(fx), int(fy)) if fx else None
             r = auto_click(session, a.by_locate, a.hwnd, force_xy,
                            a.title, a.cls, a.expect, a.retries, a.label)
-            print(json.dumps(r, ensure_ascii=False, default=_jdefault))
+            print(json.dumps(r, ensure_ascii=False, default=jdefault))
     elif a.cmd == "key":
         _sub(["sendinput.py", "key", a.args[0]])
         print("ok")
@@ -397,7 +436,7 @@ def main():
             text = " ".join(a.args)
             r = paste(session, loc["cx"], loc["cy"], text, src=loc["src"])
             print(json.dumps({"shot": r, "loc": loc},
-                             ensure_ascii=False, default=_jdefault))
+                             ensure_ascii=False, default=jdefault))
         else:
             x, y = int(a.args[0]), int(a.args[1])
             text = " ".join(a.args[2:])
@@ -408,7 +447,7 @@ def main():
                                      a.args[0] if a.args else None),
                          ensure_ascii=False))
     elif a.cmd == "shot":
-        t = tl.Timeline(session)
+        t = _tl(session)
         t.record("shot", "shot", target=a.label, method="dxcam")
         p = t.shot(label=a.label)
         print(json.dumps({"shot": p}, ensure_ascii=False))

@@ -152,6 +152,8 @@ def main():
     ap.add_argument("--region", default=None)
     ap.add_argument("--filter", default=None, help="仅返回包含该子串的文本")
     ap.add_argument("--serve", action="store_true", help="stdio 服务模式")
+    ap.add_argument("--trace-id", default=None,
+                    help="跨进程 trace 透传（P2-3）：由 uitool 注入，本脚本只接收不影响行为")
     ap.add_argument("--gpu", action="store_true", default=True)
     args = ap.parse_args()
 

@@ -28,7 +28,8 @@
 | --- | --- | --- | --- |
 | 第1轮 | P2-1 | ✅ 已完成（1 项与规划有出入，见下） | 56 单测全绿；OpenCV 收敛为 2 包；pynvml 替换完成（21ms vs nvidia-smi 147ms）；BUG-1/BUG-3 已修并实跑验证 |
 | 第2轮 | P2-2 | ✅ **已完成（含收尾清单 5 项，2026-09-19 21:4x 闭环）** | `P2-layers/`（contracts 9 + env_adapter 7）+ `P1-toolbox-legacy/`（原 P1 目录已改名，shim 已删、调用方 import 已指 P2-layers、flag restore_p1_shim.py、BUG-2 接线/BUG-4 修复）；56 单测 5 次全绿；三笔提交 f2bf819/028ffc2/a580e75 已推送 |
-| 第3~10轮 | P2-3 / P3-x / P4-x | ⬜ 未启动（暂停中） | — |
+| 第3轮 | P2-3 | 🟡 **进行中**（Step1/1b/2/3 已完成，Step4「testbar 改引用」留下一轮） | 单测基线 **56 → 70**（`Ran 70 tests in 0.462s / OK`）；trace 贯通实跑通过；详见 §三·补 P2-3 进展记录 |
+| 第4~10轮 | P3-x / P4-x | ⬜ 未启动（暂停中） | — |
 
 环境与工程侧（规划外，09-19 已完成）：文件丢失事故取证与根因定位、覆盖法修复、损失评估（结论不恢复）、
 API 逐一验证（46 项 0 失败）、环境全面检测、目录树整理归类、C1/C2 元数据修复、**整理结果逐项验证 123 项全过**、
@@ -130,6 +131,26 @@ P2 仍处暂停；是否解除并按收尾清单开工，待用户裁定。本�
 · P3-2：现状 dxcam 后续抓帧 0.28 ms、mss 21.61 ms 可作对比基线；WgcCapture.exe 仍缺失
 · P3-4：CDP 端口 9222/9223 实测不可达
 · P4-2：建议在此轮用官方 wheel 做一次「版本对齐 + 覆盖法补齐」，把 09-19 事故的外围缺失一次性补平
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+三·补、P2-3 进展记录（2026-09-20 00:4x 实测，用户三条裁定后执行）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**用户三条裁定（2026-09-20 00:3x）**
+1. `core/utils` 落点 = **`P2-layers/core/`**（新建 core 包；不进 contracts、不建顶层 core）
+2. 验收口径由「字面去重率 ≥60%」改为「**公共功能点中 ≥60% 落在 core/utils 且被单源引用**」（实测字面克隆为 0%，原口径无法达成）
+3. **必须补单测**，允许破「56 单测」口径并同步文档
+
+| 步骤 | 内容 | 结果 |
+| --- | --- | --- |
+| Step1 | `contracts/models.py` 给 `TraceSpan` 补 `span_id`/`parent_span`（默认空串、置末尾） | ✅ 56→56 仍全绿；旧 6 参构造与 `duration_ms` 实跑不变 |
+| Step1b | 测试控制台源码入库 `04-implementation/testbar-console/`（6 文件，SHA256 与桌面原件一致，原件保留） | ✅ 已暂存 |
+| Step2 | 新建 `P2-layers/core/`：`constants.py`（远控名单并集 11 项）+ `utils.py`（jdefault / keymap / proc / proc_stats / gpu / json 读写） | ✅ `gpu_total_mb=12282`、`remote_tools_running=['wujie']`、`F10→121` 实跑一致 |
+| Step2 接线 | `locate.py`/`uitool.py` 删各自 `_jdefault` 改引用 `core.utils.jdefault`；`sendinput.py` 支持键名 | ✅ CLI 全通 |
+| Step3 | `timeline.record` 增可选 span 三元组；`sendinput/ocr` 加 `--trace-id`；`uitool` 加 `set_trace/_tl/_sub` span 机制与 CLI `--trace-id` | ✅ 实跑：根 span `s0` → 子进程 span `s1`（parent=s0），业务事件结构不变 |
+| Step3b | 补单测 `test_trace_span.py`(3) + `test_core_utils.py`(11) | ✅ **基线 56 → 70**，`Ran 70 tests in 0.462s / OK` |
+
+**未完成**：Step4（testbar-console 改引用 env.py / env_probe / pynvml / core.utils）—— 用户裁定**留到下一轮单独做**（GUI 无单测覆盖，需真机 smoke）。
+**验收口径达成度**：11 项公共功能点中已落 core/utils 且被引用 7 项（jdefault、keymap、proc、远控名单、proc_stats、gpu、json 读写）≈ 64%（≥60% ✅）；窗口信息/完整性判定属"改调 env.py、env_probe"，GDI 截图经评估**不并入**（与 mss 同路，属重复造轮子）。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 四、新增：环境硬规则（09-19 实测得出，所有轮次通用）
