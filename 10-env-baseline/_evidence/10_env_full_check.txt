@@ -1,32 +1,32 @@
-环境全面检测报告  2026-09-19 05:50:21
+环境全面检测报告  2026-09-19 15:51:11
 解释器: C:\Program Files\Python313\python.exe
 
 ==============================================================================
 1. Python 库（项目实际调用面）
 ==============================================================================
 --- 1.1 项目源码直接 import 的库（实跑功能调用）---
-  ✅ PIL                          35.4 ms  size=(32, 16) mode=RGB
-  ✅ cv2                          54.3 ms  ver=4.10.0 match=1.000 imencode=True ximgproc=True
-  ✅ dxcam                       355.2 ms  frame=(1440, 2560, 3) dtype=uint8
-  ✅ mss                          57.1 ms  size=Size(width=2560, height=1440)
+  ✅ PIL                          38.5 ms  size=(32, 16) mode=RGB
+  ✅ cv2                          49.6 ms  ver=4.10.0 match=1.000 imencode=True ximgproc=True
+  ✅ dxcam                       376.4 ms  frame=(1440, 2560, 3) dtype=uint8
+  ✅ mss                          75.8 ms  size=Size(width=2560, height=1440)
   ✅ numpy                         0.1 ms  ver=2.3.5 sum=66.0 dot=(3, 3)
-  ✅ psutil                       28.8 ms  ver=7.2.2 procs=229 cpu=32 mem=63.7GB
-  ✅ pynvml                       29.3 ms  total=12282 MiB (走 ocr.py 的预加载路径)
-  ✅ paddle                     3171.3 ms  ver=3.3.1 cuda=True matmul=[[7.0, 10.0], [15.0, 22.0]]
-  ✅ paddleocr                  2336.3 ms  ver=3.7.0
+  ✅ psutil                       30.5 ms  ver=7.2.2 procs=229 cpu=32 mem=63.7GB
+  ✅ pynvml                       31.8 ms  total=12282 MiB (走 ocr.py 的预加载路径)
+  ✅ paddle                     3179.6 ms  ver=3.3.1 cuda=True matmul=[[7.0, 10.0], [15.0, 22.0]]
+  ✅ paddleocr                  2548.3 ms  ver=3.7.0
   ✅ paddlex                       0.0 ms  ver=3.7.2
 
 --- 1.2 已装但项目未直接调用（层5/UIA/配置相关，实跑导入+最小调用）---
-  ✅ comtypes(+client)            36.2 ms  ver=1.4.16 client=OK GetModule=OK
-  ✅ uiautomation                129.8 ms  前台='WorkBuddy' 类型=PaneControl 直接子控件=2
-  ✅ pywinauto                   132.7 ms  ver=0.6.9 Desktop=OK
-  ✅ pywin32(win32gui/api)         0.4 ms  win32gui.EnumWindows=466 win32api=True
+  ✅ comtypes(+client)            39.7 ms  ver=1.4.16 client=OK GetModule=OK
+  ✅ uiautomation                103.1 ms  前台='WorkBuddy' 类型=PaneControl 直接子控件=3
+  ✅ pywinauto                   139.8 ms  ver=0.6.9 Desktop=OK
+  ✅ pywin32(win32gui/api)         0.4 ms  win32gui.EnumWindows=468 win32api=True
   ✅ PyYAML                        0.2 ms  ver=6.0.2 load={'a': 1}
   ✅ requests                      0.0 ms  ver=2.34.2 Session=OK
   ✅ openpyxl                      0.5 ms  ver=3.1.5 cell=1
   ✅ python-dateutil               0.1 ms  parse=2026-09-19 04:00:00
-  ✅ pycryptodome                 12.5 ms  AES 模块可用
-  ✅ protobuf                     17.8 ms  序列化 3 字节
+  ✅ pycryptodome                 13.2 ms  AES 模块可用
+  ✅ protobuf                     19.6 ms  序列化 3 字节
   ✅ colorlog                      0.0 ms  ColoredFormatter=True
   ✅ colorama                      0.1 ms  init/deinit OK
   ✅ huggingface_hub               0.0 ms  ver=1.31.0
@@ -34,9 +34,9 @@
 ==============================================================================
 2. 外部命令与进程（subprocess 调用面）
 ==============================================================================
-  ✅ nvidia-smi             78 ms  rc=0  NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB, 616.56
-  ✅ taskkill /?            14 ms  rc=0  (帮助输出 2116 字节)
-  ✅ pynvml 取显存        14.0 ms（替代 nvidia-smi 的路径）
+  ✅ nvidia-smi             54 ms  rc=0  NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB, 616.56
+  ✅ taskkill /?            15 ms  rc=0  (帮助输出 2116 字节)
+  ✅ pynvml 取显存        10.2 ms（替代 nvidia-smi 的路径）
   ⚠ WgcCapture.exe    不存在（截图第一档 WGC 不可用 → 走 dxcam/mss，属已知状态）
   ℹ 项目用 sys.executable 作为子进程解释器（uitool.py PY = sys.executable）→ 用哪个解释器启动就必须全程一致
 
@@ -99,5 +99,5 @@
   BUG-2 env_adapter 可被显式导入: 否
 
 --- 4.4 磁盘/内存余量 ---
-  C:/ 总 200 GB / 剩余 71 GB (64% 已用)
+  C:/ 总 200 GB / 剩余 71 GB (65% 已用)
   F:/ 总 1908 GB / 剩余 989 GB (48% 已用)

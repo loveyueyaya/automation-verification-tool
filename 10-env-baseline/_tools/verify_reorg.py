@@ -282,9 +282,16 @@ def c6_readme():
 
 
 def c7_skills():
-    sec("7. 技能权威源 ↔ AppData 逐文件 SHA256")
+    sec("7. 技能权威源 ↔ AppData 逐文件 SHA256（技能代码；运行时日志只存权威源）")
     skills = ["cache-manager", "computer-use-automation", "feedback-logger",
               "local-dev-environment", "parallel-serial-decider"]
+    # 运行时日志（decision-log/ 与 log.txt）由脚本写到权威源，AppData 侧不应存在副本
+    RUNTIME = ("decision-log", "log.txt")
+
+    def is_runtime(rel):
+        rel = rel.replace("/", "\\")
+        return rel.startswith("decision-log\\") or rel == "log.txt"
+
     allok = True
     for s in skills:
         def tree(r):
@@ -295,16 +302,25 @@ def c7_skills():
                     if f == "_user_meta.json":
                         continue
                     pp = os.path.join(root, f)
-                    out[os.path.relpath(pp, r)] = hashlib.sha256(open(pp, "rb").read()).hexdigest()
+                    rel = os.path.relpath(pp, r)
+                    if is_runtime(rel):
+                        continue
+                    out[rel] = hashlib.sha256(open(pp, "rb").read()).hexdigest()
             return out
         a, b = tree(os.path.join(SKILL_SRC, s)), tree(os.path.join(SKILL_APP, s))
         only_s, only_a = sorted(set(a) - set(b)), sorted(set(b) - set(a))
         diff = sorted(k for k in set(a) & set(b) if a[k] != b[k])
         ok = not only_s and not only_a and not diff
         allok &= ok
-        item("技能 %s 逐文件一致" % s, ok,
+        item("技能 %s 代码逐文件一致" % s, ok,
              "%d 文件%s" % (len(a), "" if ok else " 仅源=%s 仅App=%s 不同=%s" % (only_s, only_a, diff)))
-    item("五技能全部逐文件一致", allok)
+        # 运行时日志：AppData 侧不应存在副本（杜绝双份漂移）
+        stale = [p for p in ("decision-log", "log.txt")
+                 if os.path.exists(os.path.join(SKILL_APP, s, p))]
+        if s == "parallel-serial-decider":
+            item("parallel-serial-decider AppData 侧无运行时日志副本", not stale,
+                 "残留=%s" % stale if stale else "已单一源化")
+    item("五技能代码全部逐文件一致", allok)
 
 
 def c8_gitignore():
@@ -330,17 +346,44 @@ def c8_gitignore():
 
 
 def c9_git():
-    sec("9. git 逐重命名核对 + 删除计数")
+    sec("9. git 状态核对：提交/推送一致性与删除计数")
     r = subprocess.run(["git", "status", "--porcelain"], cwd=BASE, capture_output=True,
                        text=True, encoding="utf-8", errors="replace")
     lines = [l for l in (r.stdout or "").splitlines() if l.strip()]
     ren = [l for l in lines if l[:1] == "R"]
     dele = [l for l in lines if l[:2].strip() == "D"]
-    P("  重命名/移动记录 %d 条：" % len(ren))
     for l in ren:
-        P("    %s" % l[:140])
+        P("    R %s" % l[:130])
     item("无删除（D=0）", not dele, "D=%d" % len(dele))
-    item("重命名/移动 ≥ 8 条", len(ren) >= 8, "%d 条" % len(ren))
+
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=BASE, capture_output=True,
+                          text=True, encoding="utf-8", errors="replace").stdout.strip()
+    lr = subprocess.run(["git", "ls-remote", "origin", "refs/heads/main"], cwd=BASE,
+                        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    remote_sha = (lr.stdout or "").split()[0] if (lr.stdout or "").split() else ""
+    if not remote_sha:
+        P("    ⚠ ls-remote rc=%s stderr=%s" % (lr.returncode, (lr.stderr or "").strip()[:160]))
+        lr2 = subprocess.run(["git", "ls-remote", "origin", "refs/heads/main"], cwd=BASE,
+                             capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", timeout=300)
+        remote_sha = (lr2.stdout or "").split()[0] if (lr2.stdout or "").split() else ""
+        if remote_sha:
+            P("    （重试后读到远端 SHA）")
+    item("本地 HEAD == 远端 main（直读远端）", bool(head) and head == remote_sha,
+         "本地=%s 远端=%s" % (head[:7], remote_sha[:7] or "读取失败"))
+    if ren:
+        item("重命名/移动已暂存待提交（≥8 条）", len(ren) >= 8, "%d 条（尚未提交）" % len(ren))
+    else:
+        # 验证器自身会产生产物（_evidence 下的报告/日志、_tools/verify_reorg.py 本体），
+        # 这些属"验证动作的输出"，不作为未提交项计入
+        SELF_OUT = ("10-env-baseline/_evidence/", "10-env-baseline/_tools/verify_reorg.py")
+        dirty = [l for l in lines if not any(l[3:].startswith(p) for p in SELF_OUT)]
+        self_out = len(lines) - len(dirty)
+        item("工作区干净（整理变更已提交）", not dirty,
+             "未提交 %d 条%s" % (len(dirty), "（另有 %d 条为验证器自身产物，已排除）" % self_out if self_out else ""))
+        for l in dirty:
+            P("    ? %s" % l[:120])
+    P("   HEAD=%s / remote main=%s" % (head[:7], remote_sha[:7] or "?"))
 
 
 def c10_tools():

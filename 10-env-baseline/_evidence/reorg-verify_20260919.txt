@@ -1,4 +1,4 @@
-目录整理全量逐项验证报告 v2  2026-09-19 05:48:36
+目录整理全量逐项验证报告 v2  2026-09-19 15:48:58
 
 ====================================================================================
 1. 根目录归位清单逐项验证
@@ -52,7 +52,7 @@
 ====================================================================================
 3. 全树旧路径/旧名残留扫描（活文档必须 0 命中）
 ====================================================================================
-  扫描文件 132；活文档命中 0（要求 0）；历史/说明性命中 27（允许）
+  扫描文件 132；活文档命中 0（要求 0）；历史/说明性命中 28（允许）
     ⚪ 05-tests\P1_验收证据_20260916_195623.md:18 [0运行环境报告]
     ⚪ 05-tests\P1_验收证据_20260916_195623.md:44 [同步到GitHub\.bat]
     ⚪ 05-tests\P1_验收证据_20260916_195623.md:45 [项目阶段进度表\.xlsx]
@@ -109,8 +109,8 @@
   ✅ 技能 computer-use-automation 逐文件一致                           1 文件
   ✅ 技能 feedback-logger 逐文件一致                                   2 文件
   ✅ 技能 local-dev-environment 逐文件一致                             3 文件
-  ✅ 技能 parallel-serial-decider 逐文件一致                           4 文件
-  ✅ 五技能全部逐文件一致                                                 
+  ❌ 技能 parallel-serial-decider 逐文件一致                           4 文件 仅源=[] 仅App=[] 不同=['decision-log\\decisions.jsonl', 'log.txt']
+  ❌ 五技能全部逐文件一致                                                 
 
 ====================================================================================
 8. .gitignore 逐项 check-ignore 期望
@@ -138,27 +138,12 @@
   ✅ .gitignore 逐项期望成立                                          
 
 ====================================================================================
-9. git 逐重命名核对 + 删除计数
+9. git 状态核对：提交/推送一致性与删除计数
 ====================================================================================
-  重命名/移动记录 16 条：
-    R  "01-requirements/0\350\277\220\350\241\214\347\216\257\345\242\203\346\212\245\345\221\212/\350\277\220\350\241\214\347\216\257\345\242\2
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/compare_deps_pyc.py" -> 04-implementation/P1-contracts-env-adapter/e
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/compare_pyc.py" -> 04-implementation/P1-contracts-env-adapter/eviden
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/diff_deps_pyc.py" -> 04-implementation/P1-contracts-env-adapter/evid
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/diff_pyc.py" -> 04-implementation/P1-contracts-env-adapter/evidence/
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/dump_full_dis.py" -> 04-implementation/P1-contracts-env-adapter/evid
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/dump_shot_get_engine.py" -> 04-implementation/P1-contracts-env-adapt
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/full_dis_out.txt" -> 04-implementation/P1-contracts-env-adapter/evid
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/\345\256\241\350\256\241\346\227\245\345\277\227_\346\255\245\351\25
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/\345\256\241\350\256\241\346\227\245\345\277\227_\346\255\245\351\25
-    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/\345\256\241\350\256\241\346\227\245\345\277\227_\346\255\245\351\25
-    RM RELEASE_NOTES_INDEX.md -> 06-deployment/RELEASE_NOTES_INDEX.md
-    RM RELEASE_NOTES_v1.md -> 06-deployment/RELEASE_NOTES_v1.md
-    R  git-sync.ps1 -> 07-operations/git-sync.ps1
-    R  "\345\220\214\346\255\245\345\210\260GitHub.bat" -> 07-operations/sync-to-github.bat
-    R  "\351\241\271\347\233\256\351\230\266\346\256\265\350\277\233\345\272\246\350\241\250.xlsx" -> 11-management/project-phase-progress.xlsx
   ✅ 无删除（D=0）                                                   D=0
-  ✅ 重命名/移动 ≥ 8 条                                               16 条
+  ❌ 本地 HEAD == 远端 main（直读远端）                                   本地=a9a5311 远端=读取失败
+  ❌ 工作区干净（整理变更已提交）                                             未提交项 3 条
+   HEAD=a9a5311 / remote main=?
 
 ====================================================================================
 10. _tools 与 legacy_repair 逐脚本：编译 + 实跑
@@ -182,11 +167,11 @@
   ✅ update_refs2.py 编译+实跑                                      rc=0 === 已更新引用的活文档（0 个）===
   ✅ update_refs3.py 编译+实跑                                      rc=0 === 已更新引用的活文档（0 个）===
   ✅ verify_e2e.py 编译+实跑                                        rc=0 ==================================================
-  ✅ verify_env_full.py 编译+实跑                                   rc=0 环境全面检测报告  2026-09-19 05:50:21
+  ✅ verify_env_full.py 编译+实跑                                   rc=0 环境全面检测报告  2026-09-19 15:51:11
   ✅ verify_packages.py 编译+实跑                                   rc=0 === 外围缺失文件 扩展名分布 ===
   ✅ verify_reorg.py 编译                                         （无实跑规格）
   ✅ verify_win32_api.py 编译+实跑                                  rc=0 DLL        API                          判定        
-  ✅ watch_files.py 编译+实跑                                       rc=0 [2026-09-19T05:50:41] cv2=122 paddle=3499 dxcam=30
+  ✅ watch_files.py 编译+实跑                                       rc=0 [2026-09-19T15:51:35] cv2=122 paddle=3499 dxcam=30
   -- 10-env-baseline\_tools\legacy_repair --
   ✅ _probe_step3.py 编译                                         
   ✅ probe_libs.py 编译                                           
@@ -203,7 +188,7 @@
 ====================================================================================
 11. 功能回归（逐项实跑）
 ====================================================================================
-  ✅ 56 单测                                                      ---------------------------------------------------------------------- | Ran 56 tests in 0.348s | OK
+  ✅ 56 单测                                                      ---------------------------------------------------------------------- | Ran 56 tests in 0.384s | OK
   ✅ 关键模块导入（28）                                                 BAD: []
   ✅ pip check 告警 ⊆ 已知基线                                        共 1 条，非基线 0 条
   ✅ 区域截图 320×200                                               
@@ -224,6 +209,9 @@
 ====================================================================================
 汇总
 ====================================================================================
-  判定项合计 121：通过 121 / 失败 0
-  ✅ 全部通过
-  耗时 129.5 s
+  判定项合计 122：通过 118 / 失败 4
+    ❌ 技能 parallel-serial-decider 逐文件一致
+    ❌ 五技能全部逐文件一致
+    ❌ 本地 HEAD == 远端 main（直读远端）
+    ❌ 工作区干净（整理变更已提交）
+  耗时 162.3 s
