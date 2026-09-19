@@ -1,0 +1,8 @@
+sacl obj = None, ace_count = None
+现有 SACL 转 SDDL 失败: TypeError('ConvertSecurityDescriptorToStringSecurityDescriptor() takes exactly 3 arguments (2 given)')
+test 仅AU: FAIL error(87, 'ConvertStringSecurityDescriptorToSecurityDescriptor', '参数错误。')
+test AU+DC: FAIL error(87, 'ConvertStringSecurityDescriptorToSecurityDescriptor', '参数错误。')
+ACL 组装（AddAuditAccessAceEx 继承版）: OK
+SetNamedSecurityInfo: None
+复核 ACE 数 = 1
+ACL 组装路线失败: TypeError('%x format: an integer is required, not str')
