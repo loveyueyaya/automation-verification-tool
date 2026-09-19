@@ -295,3 +295,12 @@ env_adapter/
   与"scripts 按层迁入 perception / execution / observability"同批做，避免重复改动。
 - BUG-2（env_adapter 零引用）与 BUG-4（framework 误判）仍未处理。
 
+
+## 9. P2-2 收尾记录（2026-09-19 19:5x）
+
+- #1 调用方 import 改向 P2-layers（scripts/locate.py、timeline.py、uitool.py + tests 4 文件，含 UITOOL_CONTRACTS_SOURCE=p1/p2 flag）
+- #2 contracts shim 删除（契约层唯一实现 = P2-layers/contracts；恢复工具 restore_p1_shim.py，内置全文兜底）
+- #3 本目录改名：P1-contracts-env-adapter → **P1-toolbox-legacy**（git mv 保历史；原名在删 shim 后已名不副实）
+- #4 feature flag 闭环已验证：restore → p1 模式 56 全绿 → --remove → p2 模式 56 全绿
+- #5 BUG-2（env_adapter 零引用）接线：uitool.see() 探测结果入审计（timeline step=env_profile，实跑验证）；BUG-4（framework 被 wujie 污染）修复：env_probe 改声明式 FRAMEWORK_RULES（目标进程判定，security 只影响 focus_reliable），实跑验证 framework 不再恒为 wujie
+- 每步 56 单测全绿（共 5 次：0.449/0.372/0.351/0.360/0.354s）；收尾前快照 20260919_194705

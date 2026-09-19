@@ -8,7 +8,14 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# --- contracts 来源引导（P2-2 收尾 #1） ---
+_TESTS = os.path.dirname(os.path.abspath(__file__))
+_P1 = os.path.dirname(_TESTS)
+_IMPL_ROOT = os.path.dirname(_P1)
+if os.environ.get("UITOOL_CONTRACTS_SOURCE", "p2").strip().lower() == "p1":
+    sys.path.insert(0, _P1)                                 # p1 模式：contracts shim（需先运行 restore_p1_shim.py）
+else:
+    sys.path.insert(0, os.path.join(_IMPL_ROOT, "P2-layers"))  # 默认：契约层唯一实现
 
 from contracts import Element, OcrItem, StateSnapshot, WindowInfo
 from contracts.state_hash import normalize_text, state_hash

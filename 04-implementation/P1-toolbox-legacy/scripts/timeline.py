@@ -22,8 +22,15 @@ import sys
 import time
 from time import perf_counter as _pc
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# --- contracts 来源引导（P2-2 收尾 #1；feature flag 说明见 restore_p1_shim.py） ---
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _HERE)                                   # scripts 自身（env/shot/... 互相 import）
+_IMPL = os.path.dirname(_HERE)                              # P1 遗留目录
+_IMPL_ROOT = os.path.dirname(_IMPL)                         # 04-implementation
+if os.environ.get("UITOOL_CONTRACTS_SOURCE", "p2").strip().lower() == "p1":
+    sys.path.insert(0, _IMPL)                               # p1 模式：经 P1 目录 contracts shim（需先运行 restore_p1_shim.py）
+else:
+    sys.path.insert(0, os.path.join(_IMPL_ROOT, "P2-layers"))  # 默认：契约层唯一实现
 from contracts import SourceEnum
 
 

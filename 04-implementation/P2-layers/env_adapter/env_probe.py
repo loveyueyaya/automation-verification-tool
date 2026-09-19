@@ -15,6 +15,11 @@ sys.path.insert(0, os.path.join(_ROOT, "scripts"))
 from contracts import CaptureMethod, EnvProfile, InputMethod  # noqa: E402
 import env as env_util  # noqa: E402
 
+# BUG-4 修复（P2-2 收尾 #5）：framework 只由"目标窗口自身进程"判定（声明式规则表），
+# 不再因系统存在远程软件（security）而整体污染。新增环境 = 加一行。
+FRAMEWORK_RULES = (("wujie", "wujie"), ("wujie2", "wujie"), ("sunloginclient", "wujie"),
+                   ("todesk", "wujie"), ("anydesk", "wujie"), ("teamviewer", "wujie"))
+
 REMOTE_SOFTWARE = ("wujie", "sunloginclient", "todesk", "anydesk",
                    "teamviewer", "向日葵", "wujie2")
 BROWSER_PROC = {"chrome.exe": "chrome", "msedge.exe": "msedge",
@@ -103,10 +108,14 @@ def probe_env(window_handle=None) -> EnvProfile:
                 prof.browser = BROWSER_PROC[pname]
             elif any(k in pname for k in ELECTRON_PROC):
                 prof.browser = "electron"
-            if prof.security or pname in ("wujie.exe",):
-                prof.framework = "wujie"
-            elif pname in BROWSER_PROC or prof.browser:
-                prof.framework = "native"
+            framework = None
+            for _key, _fw in FRAMEWORK_RULES:
+                if _key in pname:
+                    framework = _fw
+                    break
+            if framework is None and (pname in BROWSER_PROC or prof.browser):
+                framework = "native"
+            prof.framework = framework
     # 焦点可靠性：wujie/远程软件接管时不可靠（无句柄时仅按 security 判断）
     if prof.framework == "wujie" or prof.security:
         prof.focus_reliable = False

@@ -31,8 +31,15 @@ import sys
 import time
 from enum import Enum
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# --- contracts 来源引导（P2-2 收尾 #1；feature flag 说明见 restore_p1_shim.py） ---
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _HERE)                                   # scripts 自身（env/shot/... 互相 import）
+_IMPL = os.path.dirname(_HERE)                              # P1 遗留目录
+_IMPL_ROOT = os.path.dirname(_IMPL)                         # 04-implementation
+if os.environ.get("UITOOL_CONTRACTS_SOURCE", "p2").strip().lower() == "p1":
+    sys.path.insert(0, _IMPL)                               # p1 模式：经 P1 目录 contracts shim（需先运行 restore_p1_shim.py）
+else:
+    sys.path.insert(0, os.path.join(_IMPL_ROOT, "P2-layers"))  # 默认：契约层唯一实现
 import env
 import shot as shot_mod
 import locate as locate_mod
@@ -100,6 +107,26 @@ def see(session, label="", title=None, cls=None):
                    else "候选 %d 个，无规则命中（不猜）"
                         % len(pick["candidates"])),
              chain=[SourceEnum.RULE.value])
+    # BUG-2 接线（P2-2 收尾 #5）：env_adapter 探测结果入审计时间线。
+    # 最小闭环：探测 → 路由结果落审计；真实注入/截图切换由 P2-3 编排层统一。
+    try:
+        from env_adapter.env_probe import probe_env
+        _prof = probe_env(tgt["hwnd"] if tgt else None)
+        t.record("see", "env_profile",
+                 target=_prof.framework or "none",
+                 result="ok", src=SourceEnum.RULE, conf=None,
+                 note=json.dumps({"security": _prof.security,
+                                  "framework": _prof.framework,
+                                  "focus_reliable": _prof.focus_reliable,
+                                  "input_method": _v(_prof.input_method),
+                                  "capture_method": _v(_prof.capture_method),
+                                  "dpi_scale": _prof.dpi_scale,
+                                  "probe_ms": _prof.probe_ms},
+                                 ensure_ascii=False)[:300],
+                 chain=[SourceEnum.RULE.value])
+    except Exception as _e:
+        t.record("see", "env_profile", target="env_adapter", result="fail",
+                 src=SourceEnum.RULE, conf=None, note="env_adapter 探测失败: %r" % (_e,))
     t.record("see", "snapshot", target="%d 窗口" % len(wins),
              result="ok",
              note=json.dumps([{"hwnd": c["hwnd"],

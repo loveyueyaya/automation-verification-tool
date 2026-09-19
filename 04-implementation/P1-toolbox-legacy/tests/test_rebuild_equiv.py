@@ -15,8 +15,15 @@ import tempfile
 import unittest
 from unittest import mock
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts"))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+# --- contracts 来源引导（P2-2 收尾 #1） ---
+_TESTS = os.path.dirname(os.path.abspath(__file__))
+_P1 = os.path.dirname(_TESTS)
+sys.path.insert(0, os.path.join(_P1, "scripts"))            # env/uitool 等
+_IMPL_ROOT = os.path.dirname(_P1)
+if os.environ.get("UITOOL_CONTRACTS_SOURCE", "p2").strip().lower() == "p1":
+    sys.path.insert(0, _P1)                                 # p1 模式：contracts shim（需先运行 restore_p1_shim.py）
+else:
+    sys.path.insert(0, os.path.join(_IMPL_ROOT, "P2-layers"))  # 默认：契约层唯一实现
 
 import env
 import uitool
