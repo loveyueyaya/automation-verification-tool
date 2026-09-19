@@ -1,0 +1,16 @@
+﻿IsAdmin: True
+User: DESKTOP-TP4BFD5\Administrator
+=== auditpol 当前策略（含 File System 的行）===
+
+对象访问
+  文件系统                                    无审核
+  句柄操作                                    无审核
+  其他对象访问事件                                无审核
+
+
+
+=== 现有 SACL（site-packages）===
+
+=== 现有 SACL（Python313）===
+
+=== done ===

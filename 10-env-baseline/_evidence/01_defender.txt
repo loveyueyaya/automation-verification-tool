@@ -1,0 +1,4 @@
+﻿=== Get-MpComputerStatus ===
+=== Get-MpPreference (exclusions) ===
+=== Get-MpThreat ===
+=== Get-MpThreatDetection (last 50) ===

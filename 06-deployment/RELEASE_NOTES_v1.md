@@ -167,7 +167,7 @@ env_adapter/
 
 ### 7.3 字符串字面量搜索（重建后重跑）：36 处命中，真违规 0
 
-完整输出见 `证据/字符串搜索输出`（命令：`Get-ChildItem -Recurse -Include *.py | Select-String -Pattern '"ocr"|"uia"|"handle"|"template"'`）。逐条分类：
+完整输出见 `evidence/字符串搜索输出`（命令：`Get-ChildItem -Recurse -Include *.py | Select-String -Pattern '"ocr"|"uia"|"handle"|"template"'`）。逐条分类：
 
 | 分类 | 数量 | 位置 |
 |------|------|------|
@@ -180,7 +180,7 @@ env_adapter/
 
 ### 7.4 运行依赖与 pyc 一致性比对（cache/ocr/sendinput）
 
-对 F 盘 3 个复制依赖做模块级 co_names + 函数集合 + 函数 co_code 与原始 pyc 比对（脚本 `证据/compare_deps_pyc.py`、`diff_deps_pyc.py`）：
+对 F 盘 3 个复制依赖做模块级 co_names + 函数集合 + 函数 co_code 与原始 pyc 比对（脚本 `evidence/compare_deps_pyc.py`、`diff_deps_pyc.py`）：
 
 | 脚本 | co_names | 函数集合 | 函数 co_code | 结论 |
 |------|----------|----------|--------------|------|
@@ -244,3 +244,19 @@ env_adapter/
 2. **test_rebuild_equiv.py 验证的是"重建版行为自洽"，不是"与原始版等价"**：真正的等价性证明需要原始版可运行，但原始版存在 LRESULT bug，无法运行。等价性仅以"差异逐项归因"作逻辑论证（详见 7.1 / 6.1）。
 3. **ocr.py / sendinput.py 的"F 盘权威"是时间线事实**：功能升级早于 P1（06:53 桌面迭代期），P1 仅随迁；无单测、有真机冒烟；与 P1 契约化无冲突；不标"P1 越界实现"，标"P1 范围外运行依赖，P2 统一对齐"（详见 7.6）。
 
+
+
+---
+
+## 附：勘误注记（2026-09-19 目录树整理，原文不改写）
+
+本文为 P1 封板时的历史记录，正文中的路径名保持原样。以下条目在 2026-09-19 的目录树整理中已更名，**阅读时请按下表对照**：
+
+| 本文中的旧名 | 现名 |
+|---|---|
+| `evidence/`（目录） | `evidence/` |
+| `01-requirements/env-report/`（目录） | `01-requirements/env-report/` |
+| `sync-to-github.bat` | `sync-to-github.bat` |
+| `project-phase-progress.xlsx` | `project-phase-progress.xlsx` |
+
+另：根目录 `决策日志/` 已并入技能决策日志权威源（`00-doubao-llm-prerequisites\.user_skills\parallel-serial-decider\decision-log\decisions.jsonl`），该目录不再存在。

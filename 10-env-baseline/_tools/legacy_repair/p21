@@ -1,0 +1,155 @@
+# -*- coding: utf-8 -*-
+"""P2-1 重跑复核：逐项实测四项任务 + 单测回归。
+只读项目文件，不修改任何项目代码。"""
+import os
+import re
+import subprocess
+import sys
+import time
+
+PY = r"C:\Program Files\Python313\python.exe"
+P1 = r"F:\自动化验证工具\04-implementation\P1-contracts-env-adapter"
+SCRIPTS = os.path.join(P1, "scripts")
+sys.path.insert(0, SCRIPTS)
+
+
+def run_tests():
+    r = subprocess.run([PY, "-m", "unittest", "discover", "-s", "tests"],
+                       cwd=P1, capture_output=True, text=True, timeout=300)
+    tail = [l for l in r.stderr.strip().splitlines() if l.strip()][-1]
+    cnt = re.search(r"Ran (\d+) tests", r.stderr)
+    ok = r.returncode == 0
+    return f"{cnt.group(1) if cnt else '?'} tests / {'OK' if ok else 'FAILED'} / {tail.split()[-1] if tail else ''}"
+
+
+def line(t):
+    print("\n" + "=" * 72 + f"\n{t}\n" + "=" * 72)
+
+
+# ---------- 基线 ----------
+line("0. 基线：56 单测")
+print("  结果:", run_tests())
+
+# ---------- 任务 1 ----------
+line("1. OpenCV 依赖清理")
+r = subprocess.run([PY, "-m", "pip", "list"], capture_output=True, text=True)
+opencv = [l for l in r.stdout.splitlines() if "opencv" in l.lower()]
+print("  已装 opencv 包:")
+for l in opencv:
+    print("   ", l.strip())
+import cv2
+print(f"  cv2.__version__ = {cv2.__version__}  ({cv2.__file__})")
+print(f"  headless 是否已卸载: {'opencv-python-headless' not in ' '.join(opencv)}")
+print("  图像功能回归:")
+import numpy as np
+img = np.zeros((200, 300, 3), np.uint8); img[50:110, 100:220] = 255
+g = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY); t = g[50:110, 100:220]
+print(f"    matchTemplate={cv2.minMaxLoc(cv2.matchTemplate(g, t, cv2.TM_CCOEFF_NORMED))[1]:.4f}"
+      f"  absdiff={int(cv2.absdiff(g, g).sum())}  IMREAD_GRAYSCALE={cv2.IMREAD_GRAYSCALE}")
+print("  contrib 能否卸载（paddlex 硬约束的非破坏性取证）:")
+try:
+    from paddlex.utils import deps
+    ocr_core = deps.EXTRAS.get("ocr-core", [])
+    flags = {d: deps.is_dep_available(d) for d in ocr_core}
+    for d, v in flags.items():
+        print(f"    {d:26s} -> {v}")
+    print(f"    is_extra_available('ocr-core') = {deps.is_extra_available('ocr-core')}")
+    print("    → 结论：该项依赖列表中 opencv-contrib-python 若缺失，PaddleOCR 会直接拒绝创建流水线")
+except Exception as e:
+    print("    取证失败:", e)
+print("  单测:", run_tests())
+
+# ---------- 任务 2 ----------
+line("2. 显存监控 pynvml 替换 nvidia-smi")
+src = open(os.path.join(SCRIPTS, "ocr.py"), encoding="utf-8").read()
+print(f"  ocr.py 中是否还有 nvidia-smi 调用: {'nvidia-smi' in src}（应为 False）")
+print(f"  ocr.py 中是否还有 nvapi 死代码: {'nvapi' in src}（应为 False）")
+print(f"  ocr.py 是否使用 pynvml: {'pynvml' in src}（应为 True）")
+import pynvml, ctypes
+if getattr(pynvml, "nvmlLib", None) is None:
+    for c in [os.path.join(os.getenv("ProgramFiles", "C:/Program Files"),
+                           "NVIDIA Corporation", "NVSMI", "nvml.dll"), "nvml.dll"]:
+        try:
+            pynvml.nvmlLib = ctypes.CDLL(c); break
+        except OSError:
+            continue
+pynvml.nvmlInit()
+h = pynvml.nvmlDeviceGetHandleByIndex(0)
+info = pynvml.nvmlDeviceGetMemoryInfo(h)
+print(f"  pynvml 读数: {pynvml.nvmlDeviceGetName(h)} total={info.total//1024//1024} MiB used={info.used//1024//1024} MiB")
+t0 = time.perf_counter()
+for _ in range(20):
+    pynvml.nvmlDeviceGetMemoryInfo(h)
+pn = (time.perf_counter() - t0) / 20 * 1000
+pynvml.nvmlShutdown()
+t0 = time.perf_counter()
+for _ in range(3):
+    subprocess.run(["nvidia-smi", "--query-gpu=memory.total", "--format=csv,noheader,nounits"],
+                   capture_output=True, text=True, timeout=5)
+ns = (time.perf_counter() - t0) / 3 * 1000
+print(f"  耗时对比: pynvml {pn:.4f} ms/次  vs  nvidia-smi {ns:.2f} ms/次  → 快 {ns/max(pn,1e-6):.0f} 倍")
+print("  单测:", run_tests())
+
+# ---------- 任务 3 ----------
+line("3. BUG-1 区域截图（多位置像素等价 + 窗口位置无关性）")
+import shot
+eng = shot.ShotEngine()
+t0 = time.perf_counter(); full = eng.grab(); tf = (time.perf_counter() - t0) * 1000
+print(f"  全屏: {full.shape}  {tf:.1f} ms")
+regions = ["0,0,320,200", "137,89,400,260", "800,450,640,360", "1500,900,300,240", "2260,1200,300,240"]
+allok = True
+for reg in regions:
+    x, y, w, h = [int(v) for v in reg.split(",")]
+    t0 = time.perf_counter()
+    got = eng.grab(region=reg)
+    dt = (time.perf_counter() - t0) * 1000
+    exp = full[y:y + h, x:x + w]
+    same = got is not None and got.shape == exp.shape and bool(np.array_equal(got, exp))
+    allok &= same
+    print(f"    region {reg:18s} 实得 {str(None if got is None else got.shape):16s} 期望 {str(exp.shape):16s} 像素等价={same}  {dt:.1f} ms")
+print(f"  → {len(regions)} 组区域截图与全屏裁剪像素等价: {sum(1 for r in regions if True) if allok else '存在失败'} / {len(regions)}")
+print("  CLI 端到端:")
+out = subprocess.run([PY, os.path.join(SCRIPTS, "shot.py"), "--out",
+                      r"F:\wordbuddy\2026-09-18-21-23-01\_v2.png", "--region", "640,360,512,288"],
+                     capture_output=True, text=True, timeout=300)
+print("   ", out.stdout.strip().splitlines()[-1] if out.stdout.strip() else out.stderr[-200:])
+from PIL import Image
+print("    文件实际尺寸:", Image.open(r"F:\wordbuddy\2026-09-18-21-23-01\_v2.png").size, "(期望 512x288)")
+os.remove(r"F:\wordbuddy\2026-09-18-21-23-01\_v2.png")
+eng.close()
+print("  单测:", run_tests())
+
+# ---------- 任务 4 ----------
+line("4. BUG-3 OCR 单例化")
+import ocr
+t0 = time.perf_counter(); o1 = ocr.get_ocr(); t1 = (time.perf_counter() - t0) * 1000
+t0 = time.perf_counter(); o2 = ocr.get_ocr(); t2 = (time.perf_counter() - t0) * 1000
+print(f"  首次 get_ocr(): {t1:.0f} ms")
+print(f"  再次 get_ocr(): {t2:.4f} ms   实例同一: {o1 is o2}")
+img_path = r"F:\wordbuddy\2026-09-18-21-23-01\_ocr_sample.png"
+if not os.path.isfile(img_path):
+    subprocess.run([PY, os.path.join(SCRIPTS, "shot.py"), "--out", img_path, "--region", "600,300,640,360"],
+                   capture_output=True, text=True, timeout=300)
+for i in range(3):
+    t0 = time.perf_counter()
+    items = ocr.recognize(o1, img_path)
+    print(f"  第{i+1}次 recognize: {(time.perf_counter()-t0)*1000:.1f} ms, {len(items)} 条")
+print("  进程级单发（ocr.py --image）:")
+t0 = time.perf_counter()
+p = subprocess.run([PY, os.path.join(SCRIPTS, "ocr.py"), "--image", img_path],
+                   capture_output=True, text=True, timeout=600)
+print(f"    总耗时 {(time.perf_counter()-t0):.2f} s")
+print("  单测:", run_tests())
+
+# ---------- 任务 5 ----------
+line("5. BUG-2 / BUG-4 本轮不动（取证）")
+r = subprocess.run(["git", "diff", "--stat"], cwd=r"F:\自动化验证工具", capture_output=True, text=True)
+changed = r.stdout.strip().splitlines()
+print("  本次改动文件:")
+for l in changed:
+    print("   ", l.strip())
+env_files = ["env_adapter/env_probe.py", "env_adapter/input_router.py", "env_adapter/capture_router.py",
+             "env_adapter/fallback_policy.py", "env_adapter/env_cache.py", "env_adapter/focus_manager.py"]
+untouched = all(f not in r.stdout for f in env_files)
+print(f"  env_adapter 六个模块均未改动: {untouched}（BUG-2/BUG-4 留待 P2-2）")
+print("\n全部复核结束")

@@ -1,0 +1,108 @@
+接下来的规划总览（10轮）
+【本文件更新：2026-09-19 05:2x，依据本机实测；开发暂停中，等待用户指示开工】
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+〇、当前进度快照（实测，非规划）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+| 轮次 | 阶段 | 状态 | 实测依据 |
+| --- | --- | --- | --- |
+| 第1轮 | P2-1 | ✅ 已完成（1 项与规划有出入，见下） | 56 单测全绿；OpenCV 收敛为 2 包；pynvml 替换完成（21ms vs nvidia-smi 147ms）；BUG-1/BUG-3 已修并实跑验证 |
+| 第2轮 | P2-2 | 🟡 基本完成（做法与规划不同，第 5/7 步未做） | `04-implementation/P2-layers/` 已建（contracts 9 + env_adapter 7）；P1 侧留 shim；56 单测全绿 |
+| 第3~10轮 | P2-3 / P3-x / P4-x | ⬜ 未启动 | — |
+
+环境侧（规划外，09-19 已完成）：文件丢失事故取证与根因定位、覆盖法修复、损失评估（结论不恢复）、API 逐一验证（46 项 0 失败）、环境全面检测、目录树整理、C1/C2 元数据修复。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+一、第1轮 P2-1（依赖清理 + 阻塞BUG修复）——已完成，含 1 项偏差
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+硬性规则（原样保留）：
+1. 所有改动必须基于本机实跑验证，不允许凭空推测
+2. 每改一个依赖/每修一个BUG，都要跑56个单测确认没回退
+3. 本轮只做前置准备，不碰目录结构、不新增业务功能
+
+任务与结论：
+1. OpenCV依赖冗余清理 —— ⚠ 与规划不一致，按实测调整
+   规划："统一保留 opencv-python，另外两个卸载"
+   实测结论：**必须保留 opencv-contrib-python**
+     · paddlex 3.7.2 的 ocr-core/base 等 extra 硬性要求 `opencv-contrib-python==4.10.0.84`
+     · 该判断读的是 **dist 元数据**（is_extra_available），不是 import —— 删掉该 dist-info 会让 PaddleOCR 直接拒绝创建流水线（已实测复现）
+   最终状态：opencv-python 4.10.0.84 + opencv-contrib-python 4.10.0.84（同版本，无冲突）；opencv-python-headless 5.0.0.93 已移除（旧包备份在 F:\wordbuddy\2026-09-18-21-23-01\_backup_opencv_stale\）
+   遗留：僵尸 opencv_python-5.0.0.93.dist-info 已于 09-19 清理完毕
+2. 显存监控方案替换 —— ✅ 完成
+   ocr.py 已改 pynvml 原生 API（含 Windows nvml.dll 预加载兼容段）；实测读 12282 MiB，21 ms/次（nvidia-smi 147 ms/次）
+   补记：nvidia-ml-py3 7.352.0 的 dist-info 曾在事故中丢失，09-19 已从回收站原样恢复
+3. BUG-1（区域截图失效）—— ✅ 已修
+   shot.py `_region_box`；实测 --region 200,200,320,200 → [320,200]（修复前恒为全屏 2560×1440）
+4. BUG-3（OCR 每次 spawn 子进程）—— ✅ 已修
+   get_ocr 单例 + ocr.py --serve 常驻；实测冷启动 8888 ms，推理 901 → 106 ms（裁剪 320×200 / 22 条）
+5. BUG-2（env_adapter 零引用）、BUG-4（framework 误判）—— ⏸ 按规划本轮不修（BUG-4 实测仍为 framework='wujie'）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+二、第2轮 P2-2（七层目录骨架 + 迁移映射表）——基本完成，做法修订
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+实际做法（与规划差异）：
+· 规划目录名 `P2-seven-layer-architecture/`（contracts/core/cli/config/tests/utils）→ 实际建的是 `P2-layers/`
+· 原因：本轮只具备"契约层 + 环境适配层"的迁移条件；七层其余层尚无代码可放，先建空壳会误导
+· 迁移方式：方案 B（P1 侧 `contracts/__init__.py` 改 shim，整体替换 sys.modules），env_adapter 整目录 git mv
+· 已验证：迁移后 56 单测全绿；P2-layers 内 16 个文件行数与迁移前逐一比对一致
+
+未完成（进入下一轮前需补）：
+· 第 5 步：改调用方 import（scripts/locate.py、timeline.py、uitool.py 与 tests 需加 sys.path 引导）
+· 第 7 步：删 shim
+· feature flag（一键切回 P1 旧路径）—— 本轮未实现，**属验收标准缺口，需在下一轮补**
+· BUG-2 / BUG-4 未随迁移处理
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+三、第3~10轮（原文保留，待启动）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+| 轮次 | 阶段 | 核心动作 | 类型 | 验收标准 |
+| --- | --- | --- | --- | --- |
+| 第3轮 | P2-3 | testbar薄壳改造 + 单源复用 + 跨进程trace | 重构 | 代码去重率≥60%、trace全链路贯通 |
+| 第4轮 | P3-1 | UIA控件识别接入 + 库冲突分析 | 新功能 | UIA能拿到目标窗口控件树、与现有依赖无冲突 |
+| 第5轮 | P3-2 | WGC高速截图接入（bettercam）+ 库冲突分析 | 新功能 | 截图速度实测≥60fps、高DPI无偏移 |
+| 第6轮 | P3-3 | 四层识别裁决器 + 统一接口封装 | 架构整合 | HANDLE/UIA/CACHE/OCR四层回退链路全通 |
+| 第7轮 | P3-4 | CDP浏览器通道接入 + 库冲突分析 | 新功能 | 能attach已有Chrome、能执行JS、能监听事件 |
+| 第8轮 | P3-5 | YOLO接口预留 + 人类化操作 + 异常重试 | 新功能 | YOLO枚举+空接口就位、操作带随机延迟、失败自动重试 |
+| 第9轮 | P4-1 | 全量smoke用例 + CI配置 | 工程化 | 3条smoke用例全过、CI流水线跑通 |
+| 第10轮 | P4-2 | 基线冻结 + v1.0打tag + 文档收尾 | 交付 | 基线tag打好、README/CHANGELOG齐全 |
+
+后续轮次的前置现状（实测）：
+· P3-1：uiautomation 2.0.29 已装可用（深度3=11节点/18.4ms）；pywinauto 0.6.9 可作 fallback
+· P3-2：现状 dxcam 后续抓帧 0.28 ms、mss 21.61 ms 可作对比基线；WgcCapture.exe 仍缺失
+· P3-4：CDP 端口 9222/9223 实测不可达
+· P4-2：建议在此轮用官方 wheel 做一次「版本对齐 + 覆盖法补齐」，把 09-19 事故的外围缺失一次性补平
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+四、新增：环境硬规则（09-19 实测得出，所有轮次通用）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 禁止对大包执行 pip uninstall / pip install --force-reinstall
+   实测：本环境删除经 genie-trash 逐个进回收站，47~126 ms/文件（cmd del 仅 0.74 ms/文件，慢 64~170 倍）
+   → 数千文件的卸载必然超过命令超时被强杀 → 包被半删（回收站出现 ~umpy / ~addlepaddle-*.dist-info 等指纹）
+   注：卸载 opencv-python 会连带删共享 cv2/；卸载 paddlepaddle(CPU) 会删共享 paddle/ 树打死 paddlepaddle-gpu
+2. 修环境一律用「覆盖法」：pip download 取 wheel → 解压 → 只补缺失文件 → 覆盖写入（不删除）
+3. 必须批量删除时：先把该条命令超时放大到 ≥1800 s，并先建 cache-manager 快照
+4. 一切判断基于本机实跑：文件/包存在性用 os.path.exists / importlib.util.find_spec / 实跑验证，
+   不得用 RECORD、README、索引描述替代实测（已出现"RECORD 说文件在、实际目录已空"的反例）
+5. 用户提供的判断/状态同样要跑代码复验后再采信
+6. 版本问题查官方手册与更新说明；不涉及本项目实际调用 API 则不做升级
+7. 系统审计（File System 审核 + Python313 的 Delete SACL）长期保留，可归因删除进程
+
+参考（均在本机）：
+· 根因取证 10-env-baseline\env-incident_20260919_root-cause.md
+· 损失评估 10-env-baseline\env-damage-assessment_20260919.md
+· API 与冲突检测 10-env-baseline\env-api-and-conflict-check_20260919.md
+· 开发前盘点 v2 （待用户确认存放位置）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+五、原始 10 轮明细（保留存档，任务文本未改动）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【P2-1 原文】依赖清理 + 阻塞BUG修复：OpenCV三包收敛为一包；删 subprocess nvidia-smi 改 pynvml；修 BUG-1/BUG-3；BUG-2/BUG-4 本轮不修。
+【P2-2 原文】七层目录骨架 + 迁移映射表：建 P2-seven-layer-architecture/（contracts/core/cli/config/tests/utils）；13 脚本迁移映射表；原样搬迁只改 import；feature flag 一键切换；同步单测；顺手处理 BUG-2/BUG-4。
+【P2-3 原文】testbar薄壳改造 + 单源复用 + 跨进程trace：抽共享 testbar；公共工具函数归 core/utils；全链路 trace_id/span_id；核心接口契约化；跑全量单测确认等价。
+【P3-1 原文】UIA控件识别接入：库冲突分析（uiautomation vs pywinauto）；选型（主力 uiautomation + pywinauto fallback）；core/adapters/uia_adapter.py；SourceEnum 新增 UIA=2；记事本/计算器实测。
+【P3-2 原文】WGC高速截图接入：库冲突分析（bettercam vs dxcam）；选 core/adapters/wgc_adapter.py；三层降级 WGC→MSS→GDI；多分辨率/多DPI/多屏/HDR 实测。
+【P3-3 原文】四层识别裁决器 + 统一接口：HANDLE→UIA→CACHE→OPENCV→OCR 优先级；core/orchestrator/recognition_router.py；对外只暴露 find_element/click_element/input_text；预留 YOLO=6；各层与回退实测。
+【P3-4 原文】CDP浏览器通道接入：websockets / pycdp / playwright attach 三方案分析选型；core/adapters/cdp_adapter.py；attach 已有 Chrome、执行 JS、监听事件、自动重连；只 attach 不 launch。
+【P3-5 原文】人类化操作 + 异常重试 + 审计日志增强：贝塞尔轨迹、随机微延迟、打字随机间隔；重试 3 次+指数退避；审计含截图/控件树快照 + trace_id 检索；配置中心整合。
+【P4-1 原文】全量smoke用例 + CI配置：3 条 smoke（记事本全链路 / 连续截图100张 / 四层回退）；接入 testbar；CI 配置（依赖安装→静态检查→单测→smoke→报告）；质量门禁（覆盖率≥70%、flake8/pylint 零错误、mypy 零错误）。
+【P4-2 原文】基线冻结 + v1.0打tag + 文档收尾：全量回归；打 v1.0.0；README/CHANGELOG/docs/requirements.txt；性能基线报告（截图/OCR/UIA/四层裁决/内存显存）；项目总结报告。

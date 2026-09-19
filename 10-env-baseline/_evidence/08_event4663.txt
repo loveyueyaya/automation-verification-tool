@@ -1,0 +1,6 @@
+﻿start
+4663 事件数: 3
+  09/19/2026 04:19:17 | 进程=C:\Program Files\WorkBuddy\resources\vendor\genie-trash\win32-x64.exe | PID=0x2e4c | 对象=C:\$RECYCLE.BIN\S-1-5-21-2793898255-2947292128-326089831-500\$RMZ6QIW.txt
+  09/19/2026 04:19:17 | 进程=C:\Program Files\WorkBuddy\resources\vendor\genie-trash\win32-x64.exe | PID=0x2e4c | 对象=C:\Program Files\Python313\Lib\site-packages\_wbaudit\probe.txt
+  09/19/2026 04:19:17 | 进程=C:\Program Files\WorkBuddy\resources\vendor\genie-trash\win32-x64.exe | PID=0x2e4c | 对象=C:\Program Files\Python313\Lib\site-packages\_wbaudit\probe.txt
+end

@@ -263,7 +263,7 @@ cd "/f/自动化验证工具/04-implementation/P1-contracts-env-adapter"
 1. `cl.exe`（MSVC）未入 PATH —— 需编译 C++ 扩展时先跑 `vcvars64.bat`，不影响当前纯 Python 阶段。
 2. 本机 `security=wujie` 导致 `focus_reliable=False` —— UI 自动化实测前建议关闭远程控制软件。
 3. 下一步按用户指令执行 P2-2，**严格按第十节 7 步顺序**，第 1 步动手前先建可回滚缓存。
-4. `.workbuddy/`（项目级 memory）与 3 个旧资产（`HANDOVER.md` / `P1_acceptance_evidence.zip` / `P1_patch1_release_notes.md`）已于 2026-09-18 加入 `.gitignore`，不再出现在 untracked 列表。
+4. `.workbuddy/`（项目级 memory）与 3 个旧资产（`11-management/HANDOVER.md` / `05-tests/P1_acceptance_evidence.zip` / `06-deployment/P1_patch1_release_notes.md`）已于 2026-09-18 加入 `.gitignore`，不再出现在 untracked 列表。
 
 ---
 

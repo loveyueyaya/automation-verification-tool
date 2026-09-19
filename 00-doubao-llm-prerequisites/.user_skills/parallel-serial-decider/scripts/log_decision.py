@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""追加一行决策日志到 F:\\自动化验证工具\\决策日志\\decisions.jsonl
+"""追加一行决策日志到技能决策日志权威源（decision-log/decisions.jsonl，并同步 log.txt 可读镜像）
 
 用法：
   python log_decision.py --task "改分支名+写文档" --keywords "改分支名,写文档" ^

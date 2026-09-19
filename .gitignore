@@ -237,3 +237,9 @@ HANDOVER.md
 # 已在 GitHub Release 的本地副本（不入库）
 P1_acceptance_evidence.zip
 P1_patch1_release_notes.md
+
+# 阶段验收资产（本地副本，不入库；2026-09-19 归位后仍保持未跟踪）
+06-deployment/P1-pyc-cache-backup/
+
+# 本地资产（wheel 归档 / 旧包备份，体积大，不入库；重建方式见同目录 README）
+10-env-baseline/_local_assets/

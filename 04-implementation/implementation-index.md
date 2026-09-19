@@ -17,7 +17,7 @@
 - P1-contracts-env-adapter/scripts/ — 脚本（env / locate / uitool / timeline / shot / cache / ocr / sendinput）
 - P1-contracts-env-adapter/tests/ — 56 个单测（test_rebuild_equiv / test_select_flow / test_stable_id / test_state_hash）
 - P1-contracts-env-adapter/timeline/ — 时间线会话记录（shots 截图）
-- P1-contracts-env-adapter/证据/ — 重建与审计证据（compare_pyc / diff_pyc / full_dis_out.txt / 审计日志）
+- P1-contracts-env-adapter/evidence/ — 重建与审计证据（compare_pyc / diff_pyc / full_dis_out.txt / 审计日志）
 - P1-contracts-env-adapter/MIGRATION.md — 迁移说明与已知偏差
 - P1-contracts-env-adapter/自查报告.md — P1 自查报告
 

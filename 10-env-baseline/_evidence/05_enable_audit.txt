@@ -1,0 +1,113 @@
+﻿=== 0. 回滚信息（原始 SACL 备份）===
+[C:\Program Files\Python313] 原 SACL: 
+[C:\Program Files\Python313] Sddl = O:SYG:SYD:AI(A;ID;FA;;;S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464)(A;CIIOID;GA;;;S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464)(A;ID;FA;;;SY)(A;OICIIOID;GA;;;SY)(A;ID;FA;;;BA)(A;OICIIOID;GA;;;BA)(A;ID;0x1200a9;;;BU)(A;OICIIOID;GXGR;;;BU)(A;OICIIOID;GA;;;CO)(A;ID;0x1200a9;;;AC)(A;OICIIOID;GXGR;;;AC)(A;ID;0x1200a9;;;S-1-15-2-2)(A;OICIIOID;GXGR;;;S-1-15-2-2)
+=== 1. 开启 File System 审核 ===
+用法: AuditPol command [<sub-command><options>]
+
+
+
+
+
+命令 (每次执行仅允许一个命令)
+
+  /?               帮助(与上下文相关)
+
+  /get             显示当前审核策略。
+
+  /set             设置审核策略。
+
+  /list            显示可选择的策略元素。
+
+  /backup          将审核策略保存到文件。
+
+  /restore         将审核策略从文件还原。
+
+  /clear           清除审核策略。
+
+  /remove          删除用户账户的每用户审核策略。
+
+  /resourceSACL    配置全局资源 SACL
+
+auditpol : 发生错误 0x00000057:
+所在位置 行:456 字符: 7
++ $r1 = auditpol /set /subcategory:"File System" /success:enable /failu ...
++       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (发生错误 0x00000057::String) [], Remo 
+   teException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+参数错误。
+
+
+
+
+
+
+
+有关每个命令的详细信息，请使用 AuditPol <command> /?
+
+
+=== 2. 设置可继承 SACL（仅审计删除类操作）===
+[C:\Program Files\Python313] SACL 已设置
+=== 3. 复核 ===
+[C:\Program Files\Python313] 现 SACL: 
+
+FileSystemRights  : DeleteSubdirectoriesAndFiles, Delete
+AuditFlags        : Success, Failure
+IdentityReference : Everyone
+IsInherited       : False
+InheritanceFlags  : ContainerInherit, ObjectInherit
+PropagationFlags  : None
+
+
+
+
+=== 4. auditpol 复核 ===
+用法: AuditPol command [<sub-command><options>]
+
+
+
+
+
+命令 (每次执行仅允许一个命令)
+
+  /?               帮助(与上下文相关)
+
+  /get             显示当前审核策略。
+
+  /set             设置审核策略。
+
+  /list            显示可选择的策略元素。
+
+  /backup          将审核策略保存到文件。
+
+  /restore         将审核策略从文件还原。
+
+  /clear           清除审核策略。
+
+  /remove          删除用户账户的每用户审核策略。
+
+  /resourceSACL    配置全局资源 SACL
+
+
+
+
+
+有关每个命令的详细信息，请使用 AuditPol <command> /?
+
+auditpol : 发生错误 0x00000057:
+所在位置 行:478 字符: 4
++ W (auditpol /get /subcategory:"File System" 2>&1 | Out-String)
++    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (发生错误 0x00000057::String) [], Remo 
+   teException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+参数错误。
+
+
+
+
+=== done ===

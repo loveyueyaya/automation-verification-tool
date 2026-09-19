@@ -11,6 +11,23 @@ description: "操作 Windows 本机开发环境的技能：提供已安装工具
 
 ## 核心规则
 
+### 绝对规则（用户 2026-09-19 裁定，最高优先级，违反即打回重做）
+
+1. **一切判断必须建立在本地代码的真实执行结果上**：不许猜测、不许"应该/大概/可能"，每一步都要先跑代码/命令，用原始输出（版本号、报错、哈希、行号）作唯一判据。
+2. **文件/包/接口是否存在，只能用执行验证**：`os.path.exists`、`importlib.util.find_spec`、实跑调用；**不得**用 `RECORD`、`top_level.txt`、README 或索引文件的描述替代实测（2026-09-19 实测出现过 RECORD 说"文件在"而实际目录已丢失的反例）。
+3. **先取证再动手**：结论必须附命令 + 原始输出；跑不了的结论标注"未验证"，不得包装成结论。
+4. **破坏性操作必须可回滚**：删除/覆盖/移动前先建 cache-manager 快照；修环境一律用「覆盖法」（`pip download` 取 wheel → 解压 → 只补缺失文件 → 覆盖写入），**禁用 `pip --force-reinstall`**（共享命名空间包会连带卸载 numpy）。批量删除类操作（`git rm`、批量 `rm`）会触发目录级文件丢失，改用 `git mv` 或先 `git add` 入对象库。
+5. **用户的话同样是待验证输入**：用户给的判断/原因/状态先跑代码复验再采信，复验不通过就如实给实测数据。
+6. **版本问题查官方手册与更新说明**：不靠记忆与第三方博客；**若变更不涉及本项目实际调用的 API，则不做升级**（是否涉及靠 grep 本仓调用点 + 实跑判断）。
+
+### 本机删除操作的高危特性（2026-09-19 根因取证结论，必读）
+
+- 本环境下**命令触发的删除会被逐个文件转入回收站**（执行者 `genie-trash\win32-x64.exe`，系统审计 4663 实证），实测 **47~126 ms/文件**；对照不经该通道的 `cmd /c del` 仅 **0.74 ms/文件** → **慢 64~170 倍**。
+- 后果：`pip uninstall` / `--force-reinstall` 这类万级文件操作会**超过命令超时（180~600s）被强杀**（沙箱日志 `killed=true` 28 次，与删除潮结束时刻精确重合），卸载中断 → 包被半删（回收站出现 `~umpy`、`~addlepaddle-3.3.1.dist-info` 等 `~pkg` 残留）。
+- **禁令**：在本环境对大包执行 `pip uninstall` / `pip install --force-reinstall`。卸载 `opencv-python` 连带删共享 `cv2/`；卸载 `paddlepaddle`(CPU) 会删共享 `paddle/` 树打死 `paddlepaddle-gpu`。
+- **必须批量删除时**：先把该条命令超时放大到 ≥1800 s 并先建缓存；纯残留目录可评估走 `cmd /c rd /s /q` 快速通道（放弃可撤销）。
+- 排查工具（可复用）：`F:\自动化验证工具\10-env-baseline\_tools\` 下 `recycle_forensics.py` / `damage_check.py` / `analyze_waves.py` / `attribute_waves.py` / `watch_files.py` / `restore_from_wheels.py`。
+
 - 本机命令可用 **PowerShell** 或 **Bash（Git Bash for Windows）**。**实测限制**：PowerShell 工具在本环境下 stdout 可能不回传（只返回 exit code、零输出），需要完整原始输出时改用 Bash + python。PowerShell 调用带完整路径的可执行文件必须加 `&` 前缀，例如 `& "C:\Program Files\Python313\python.exe" --version`；探测命令用 `cmd /c "where git"`。详见「平台实测坑」一节。
 - Agent 会话的 PATH **不一定包含**新装工具：始终优先使用绝对路径调用工具，除非先用 `where`/`Test-Path` 验证短命令可用。
 - 本机是用户真实系统（完全访问模式）：只处理用户明确要求的文件与范围；不随意删除、覆盖、移动用户的文件；写入项目输出前先确认目标目录。

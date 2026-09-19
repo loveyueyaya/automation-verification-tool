@@ -157,7 +157,7 @@ env_adapter/
 
 ### 7.3 字符串字面量搜索（重建后重跑）：36 处命中，真违规 0
 
-完整输出见 `证据/字符串搜索输出`（命令：`Get-ChildItem -Recurse -Include *.py | Select-String -Pattern '"ocr"|"uia"|"handle"|"template"'`）。逐条分类：
+完整输出见 `evidence/字符串搜索输出`（命令：`Get-ChildItem -Recurse -Include *.py | Select-String -Pattern '"ocr"|"uia"|"handle"|"template"'`）。逐条分类：
 
 | 分类 | 数量 | 位置 |
 |------|------|------|
@@ -170,7 +170,7 @@ env_adapter/
 
 ### 7.4 运行依赖与 pyc 一致性比对（cache/ocr/sendinput）
 
-对 F 盘 3 个复制依赖做模块级 co_names + 函数集合 + 函数 co_code 与原始 pyc 比对（脚本 `证据/compare_deps_pyc.py`、`diff_deps_pyc.py`）：
+对 F 盘 3 个复制依赖做模块级 co_names + 函数集合 + 函数 co_code 与原始 pyc 比对（脚本 `evidence/compare_deps_pyc.py`、`diff_deps_pyc.py`）：
 
 | 脚本 | co_names | 函数集合 | 函数 co_code | 结论 |
 |------|----------|----------|--------------|------|

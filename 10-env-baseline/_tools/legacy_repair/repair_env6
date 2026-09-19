@@ -1,0 +1,87 @@
+# -*- coding: utf-8 -*-
+"""P2-1 环境修复第六轮：按名单强制覆盖（同一版本 wheel 全量覆盖写入，不删除任何文件）。
+
+用途：上一轮 pip uninstall 把若干包的 dist-info 整个删掉，导致"按 RECORD 扫描"发现不了它们，
+因此改为对关键包直接强制覆盖，保证文件与元数据都完整。
+"""
+import os
+import shutil
+import subprocess
+import tempfile
+import zipfile
+
+PY = r"C:\Program Files\Python313\python.exe"
+SP = r"C:\Program Files\Python313\Lib\site-packages"
+BASE = r"F:\自动化验证工具\10-env-baseline\pip_before_20260918.txt"
+PADDLE_IDX = "https://www.paddlepaddle.org.cn/packages/stable/cu126/"
+
+base = {}
+for line in open(BASE, encoding="utf-8", errors="ignore"):
+    line = line.strip()
+    if "==" in line:
+        n, v = line.split("==", 1)
+        base[n.lower().replace("_", "-")] = v
+base.setdefault("pywin32", "312")
+base.setdefault("uiautomation", "2.0.29")
+base.setdefault("nvidia-ml-py3", "7.352.0")
+
+# 项目运行 & PaddleOCR 链路必需的关键包（按依赖顺序）
+CRITICAL = [
+    "numpy", "pillow", "psutil", "comtypes", "pyyaml", "tqdm", "packaging",
+    "certifi", "urllib3", "idna", "charset-normalizer", "chardet", "requests",
+    "protobuf", "pycryptodome", "python-dateutil", "six", "cffi", "colorlog",
+    "shapely", "pyclipper", "pypdfium2", "openpyxl", "opt-einsum", "networkx",
+    "imagesize", "python-bidi", "py-cpuinfo", "pefile",
+    "httpx", "anyio", "httpcore", "h11", "sniffio", "aiohttp", "multidict",
+    "frozenlist", "aiosignal", "attrs", "filelock", "fsspec", "tqdm",
+    "mss", "dxcam", "uiautomation", "pywin32",
+    "paddlepaddle-gpu", "paddleocr", "paddlex",
+]
+
+
+def overlay(whl):
+    unz = tempfile.mkdtemp(prefix="fz6_")
+    with zipfile.ZipFile(whl) as z:
+        z.extractall(unz)
+    n = 0
+    for root, _, fs in os.walk(unz):
+        for f in fs:
+            s = os.path.join(root, f)
+            rel = os.path.relpath(s, unz).replace("/", os.sep)
+            dst = os.path.join(SP, rel)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copy2(s, dst)
+            n += 1
+    return n
+
+
+def main():
+    seen = set()
+    for pkg in CRITICAL:
+        if pkg in seen:
+            continue
+        seen.add(pkg)
+        ver = base.get(pkg)
+        if not ver:
+            print(f"  [跳过] {pkg}（基线无版本）")
+            continue
+        d = tempfile.mkdtemp(prefix="f6_")
+        cmd = [PY, "-m", "pip", "download", "--no-deps", "--no-cache-dir", "-d", d, f"{pkg}=={ver}"]
+        if pkg.startswith("paddlepaddle"):
+            cmd += ["-i", PADDLE_IDX]
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=3000)
+        whls = [os.path.join(d, f) for f in os.listdir(d) if f.endswith(".whl")]
+        if not whls:
+            print(f"  [失败] {pkg}=={ver} 下载失败（{(r.stderr or '').strip()[-80:]}）", flush=True)
+            continue
+        try:
+            n = overlay(whls[0])
+            print(f"  [覆盖] {pkg:22s} {ver:14s} 写入 {n:5d} 个文件", flush=True)
+        except Exception as e:
+            print(f"  [失败] {pkg} 写入异常 {type(e).__name__}: {e}", flush=True)
+
+
+if __name__ == "__main__":
+    print("=== 关键包强制覆盖修复 ===", flush=True)
+    main()
+    print("第六轮结束", flush=True)

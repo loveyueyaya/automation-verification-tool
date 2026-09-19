@@ -1,0 +1,67 @@
+﻿=== A. AV 注册表 (Security Center) ===
+=== B. SecurityCenter2 ===
+=== C. 安全相关服务（运行中） ===
+Running | 360DesktopLiteApp | 360DesktopLiteApp service
+Running | mpssvc | Windows Defender Firewall
+Running | wscsvc | 安全中心
+=== D. 进程（安全/远控关键词） ===
+25512 | 360DesktopLite64 | D:\软件\360桌面\DesktopLite\360DesktopLite64.exe
+5904 | 360DesktopService64 | D:\软件\360桌面\DesktopLite\360DesktopService64.exe
+6508 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+8880 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+9420 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+15048 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+18772 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+19244 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+19548 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+20880 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+21580 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+21928 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+23136 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+23328 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+23340 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+23364 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+23680 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+23804 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+23840 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+24184 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+25564 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+28124 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+28436 | 360se | D:\软件\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器-15.3.6572.64-色精简版\360安全浏览器v15.3.6572.64绿色精简版\360SE\Application\360se.exe
+9088 | douyin_guard | C:\Program Files (x86)\ByteDance\douyin\douyin_guard.exe
+20344 | sandbox-center | C:\Program Files\WorkBuddy\resources\app.asar.unpacked\cli\vendor\sandbox\5.5.5\sandbox-center.exe
+25816 | sandbox-cli | C:\Program Files\WorkBuddy\resources\app.asar.unpacked\cli\vendor\sandbox\5.5.5\sandbox-cli.exe
+26992 | sandbox-cli-gc | C:\Program Files\WorkBuddy\resources\app.asar.unpacked\cli\vendor\sandbox\5.5.5\sandbox-cli-gc.exe
+13340 | wujie | F:\leidian\wujie\bin\wujie.exe
+=== E. 计划任务（清理/删除类） ===
+Disabled | AD RMS Rights Policy Template Management (Automated) | \Microsoft\Windows\Active Directory Rights Management Services Client\
+Disabled | AD RMS Rights Policy Template Management (Manual) | \Microsoft\Windows\Active Directory Rights Management Services Client\
+Disabled | CleanupTemporaryState | \Microsoft\Windows\ApplicationData\
+Disabled | DsSvcCleanup | \Microsoft\Windows\ApplicationData\
+Ready | Pre-staged app cleanup | \Microsoft\Windows\AppxDeploymentClient\
+Ready | SilentCleanup | \Microsoft\Windows\DiskCleanup\
+Ready | TempSignedLicenseExchange | \Microsoft\Windows\License Manager\
+Disabled | MdmDiagnosticsCleanup | \Microsoft\Windows\Management\Provisioning\
+Ready | PrinterCleanupTask | \Microsoft\Windows\Printing\
+Disabled | PrintJobCleanupTask | \Microsoft\Windows\Printing\
+Ready | StartComponentCleanup | \Microsoft\Windows\Servicing\
+Queued | SetupCleanupTask | \Microsoft\Windows\Setup\
+Queued | Windows Defender Cleanup | \Microsoft\Windows\Windows Defender\
+=== F. 磁盘清理/存储感知注册表 ===
+
+
+01           : 0
+04           : 0
+PSPath       : Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SOFTWARE\
+               Microsoft\Windows\CurrentVersion\StorageSense\Parameters\Storage
+               Policy
+PSParentPath : Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SOFTWARE\
+               Microsoft\Windows\CurrentVersion\StorageSense\Parameters
+PSChildName  : StoragePolicy
+PSDrive      : HKLM
+PSProvider   : Microsoft.PowerShell.Core\Registry
+
+
+
+
+=== done ===

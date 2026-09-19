@@ -1,0 +1,9 @@
+﻿=== 1. 已注册杀软 (root\SecurityCenter2) ===
+
+=== 2. Get-MpComputerStatus (Defender) ===
+ERR: 无法将“Get-MpComputerStatus”项识别为 cmdlet、函数、脚本文件或可运行程序的名称。请检查名称的拼写，如果包括路径，请确保路径正确，然后再试一次。
+=== 3. Get-MpThreatDetection ===
+ERR: 无法将“Get-MpThreatDetection”项识别为 cmdlet、函数、脚本文件或可运行程序的名称。请检查名称的拼写，如果包括路径，请确保路径正确，然后再试一次。
+=== 4. Get-MpPreference 排除项 ===
+ERR: 无法将“Get-MpPreference”项识别为 cmdlet、函数、脚本文件或可运行程序的名称。请检查名称的拼写，如果包括路径，请确保路径正确，然后再试一次。
+=== done ===

@@ -1,0 +1,71 @@
+# -*- coding: utf-8 -*-
+"""通用：比对基线快照，把缺失的包用「下载 wheel + 覆盖写入」补回（不删除任何文件）。
+跳过体积过大的包（paddlepaddle*/nvidia-cu*），这些单独处理。"""
+import glob
+import os
+import subprocess
+import tempfile
+import zipfile
+
+PY = r"C:\Program Files\Python313\python.exe"
+SP = r"C:\Program Files\Python313\Lib\site-packages"
+BASE = r"F:\自动化验证工具\10-env-baseline\pip_before_20260918.txt"
+SKIP_PREFIX = ("paddlepaddle", "nvidia-cuda", "nvidia-cublas", "nvidia-cudnn",
+               "nvidia-cufft", "nvidia-curand", "nvidia-cusparse", "nvidia-nvjitlink")
+
+
+def norm(n):
+    return n.lower().replace("_", "-")
+
+
+base = {}
+for line in open(BASE, encoding="utf-8", errors="ignore"):
+    line = line.strip()
+    if "==" in line:
+        n, v = line.split("==", 1)
+        base[norm(n)] = v
+
+now = set()
+for di in glob.glob(os.path.join(SP, "*.dist-info")):
+    name = os.path.basename(di)[: -len(".dist-info")]
+    if "-" in name:
+        now.add(norm(name.rsplit("-", 1)[0]))
+
+missing = [(n, v) for n, v in base.items() if n not in now]
+print(f"基线缺失 {len(missing)} 个包")
+for n, v in sorted(missing):
+    print(f"  - {n}=={v}")
+
+done = []
+for n, v in sorted(missing):
+    if n.startswith(SKIP_PREFIX):
+        print(f"\n[跳过-大包] {n} {v}")
+        continue
+    print(f"\n[恢复] {n}=={v} ...", flush=True)
+    d = tempfile.mkdtemp(prefix="rs_")
+    r = subprocess.run([PY, "-m", "pip", "download", "--no-deps", "--no-cache-dir",
+                        "-d", d, f"{n}=={v}"], capture_output=True, text=True, timeout=1800)
+    whls = [os.path.join(d, f) for f in os.listdir(d) if f.endswith(".whl")]
+    if not whls:
+        print(f"   !! 下载失败 rc={r.returncode} {(r.stderr or '')[-150:]}", flush=True)
+        continue
+    whl = whls[0]
+    tmp = tempfile.mkdtemp(prefix="rsz_")
+    with zipfile.ZipFile(whl) as z:
+        z.extractall(tmp)
+    cnt = 0
+    for root, _, fs in os.walk(tmp):
+        for fn in fs:
+            src = os.path.join(root, fn)
+            rel = os.path.relpath(src, tmp).replace("/", os.sep)
+            if rel.endswith("RECORD"):
+                continue
+            dst = os.path.join(SP, rel)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with open(src, "rb") as a, open(dst, "wb") as b:
+                b.write(a.read())
+            cnt += 1
+    print(f"   -> {os.path.basename(whl)} ({os.path.getsize(whl)//1024} KB), 写入 {cnt} 个文件", flush=True)
+    done.append(n)
+
+print("\n恢复完成:", done)

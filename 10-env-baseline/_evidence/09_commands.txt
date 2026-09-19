@@ -1,0 +1,70 @@
+############ 00:0[0-9] ############
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; cd "F:/自动化验证工具" && echo "=== git 状态（改动前）==="; git status --porcelain | he, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=120000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":5052
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; cd "F:/自动化验证工具/04-implementation/P1-contracts-env-adapter" && echo "=== 基线①：56 , cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=120000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":34476
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -c "
+pid":26176
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; echo "=== 卸载前 cv2 目录体积 ==="; du -sm "C:/Program Files/Python313/Lib/site-packages/cv2";, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=180000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":33952
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; echo "=== import cv2 现状 ==="; "C:/Program Files/Python313/python.exe" -c "import cv2; print('OK',, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=120000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":20664
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -m pip uninstall -y opencv-python opencv-contrib-python openc, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=180000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":43324
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -m pip uninstall -y opencv-python opencv-contrib-python openc, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=300000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":41328
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; SP="C:/Program Files/Python313/Lib/site-packages"; echo "=== ~ 开头的残留 ==="; ls -d "$SP"/~* 2, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=120000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":41420
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; SP="C:/Program Files/Python313/Lib/site-packages"; BK="F:/wordbuddy/2026-09-18-21-23-01/_backup_openc, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=420000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":32128
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; grep -E "ERROR|error|Downloading|Collecting|Could not|WARNING: Retry|Connection" /tmp/inst.log | head, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=120000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":43752
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -m pip install --no-deps --no-cache-dir "opencv-python==5.0.0, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=420000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":38056
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; echo "=== numpy 现状 ==="; "C:/Program Files/Python313/python.exe" -m pip list 2>/dev/null | grep -, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=120000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":44156
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -m pip install --no-deps --no-cache-dir "numpy==2.3.5" > /tmp, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=420000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":37160
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; cd "F:/自动化验证工具/04-implementation/P1-contracts-env-adapter" && echo "=== ① opencv 包, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=180000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":7336
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; SP="C:/Program Files/Python313/Lib/site-packages"; BK="F:/wordbuddy/2026-09-18-21-23-01/_backup_openc, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=300000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":23988
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; echo "=== numpy 是否仍正常 ==="; "C:/Program Files/Python313/python.exe" -c "import numpy; a=num, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=300000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":41904
+############ 00:1[0-9] ############
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; echo "=== paddlex extras 定义 ==="; "C:/Program Files/Python313/python.exe" -c "
+pid":13660
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -c "
+pid":40052
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; sed -n '1,80p' "C:/Program Files/Python313/Lib/site-packages/paddlex/utils/deps.py" | grep -n "def is, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=120000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":504
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; grep -n "is_dep_available" -A 22 "C:/Program Files/Python313/Lib/site-packages/paddlex/utils/deps.py", cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=120000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":45012
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; echo "=== ① 装回 contrib（--no-deps，不碰 numpy）==="; "C:/Program Files/Python313/python.ex, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=420000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":41676
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -m pip install --no-deps --force-reinstall --no-cache-dir "op, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=600000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":19380
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; echo "=== numpy 单独导入 ==="; "C:/Program Files/Python313/python.exe" -c "import numpy; print('n, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=120000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":38672
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; SP="C:/Program Files/Python313/Lib/site-packages"; echo "=== numpy 目录内容抽样 ==="; ls "$SP/n, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=600000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=156
+pid":26176
+############ 01:4[7-9] ############
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" "C:/Users/Administrator/.workbuddy/skills/cache-manager/scrip, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=420000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=160
+pid":26128
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -c "
+pid":26412
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; cd "F:/自动化验证工具/04-implementation/P1-contracts-env-adapter" && echo "=== 基线①：56 , cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=300000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=160
+pid":27444
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -c "
+pid":16008
+############ 01:5[0-9] ############
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; echo "=== uninstall 日志 ==="; tail -5 /tmp/unin.log 2>/dev/null; echo "=== 当前 pip list opencv , cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=180000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=160
+pid":9076
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; ls -d "C:/Program Files/Python313/Lib/site-packages"/~* 2>/dev/null || echo "(无 ~ 残留)"; echo "=, cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=300000, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=160
+pid":8248
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -c "
+pid":27004
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; "C:/Program Files/Python313/python.exe" -c "
+pid":16192
+displayCommand=export PATH="/c/Users/Administrator/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin:$PATH"; cd "F:/wordbuddy/2026-09-18-21-23-01" && "C:/Program Files/Python313/python.exe" repair_env5_autofix., cwd=f:\wordbuddy\2026-09-18-21-23-01, timeoutMs=0, executionMode=Sandbox, stdoutMode=Some("pipe"), cols=None, rows=None, pathOverride=Some("C:\\Users\\Administrator\\.workbuddy\\binaries\\PortableGit\\versions\\1.2.0\\bin"), stdinMode=Some("pipe"), envKeys=159
+pid":26824

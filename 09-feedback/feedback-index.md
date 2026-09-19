@@ -26,8 +26,15 @@
 ## 技能位置（feedback-logger）
 
 - 权威源：`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\feedback-logger\`
-- 镜像：`C:\...\workspace\.skills\feedback-logger\`（复制副本，不用 junction，防系统清理连带删除）
-- 自动加载：经 AppData `.user_skills` junction（→F 盘权威源）与 `.skills` 镜像双路径可见，每轮对话注入
+- 加载目录：`C:\Users\Administrator\.workbuddy\skills\feedback-logger\`（**实体目录副本**，非 junction —— 2026-09-19 实测）
+- 同步要求：改权威源后必须复制到 AppData 并用 SHA256 逐文件校验，否则下一轮不生效
+
+## 遗留问题清单（issues）
+
+| 编号 | 主题 | 状态 |
+|---|---|---|
+| issue_001 | 中文目录导致 GitHub URL 编码失败 | 已解决 |
+| issue_002 | site-packages 包文件批量丢失 | 根因已定位（工具层删除逐个进回收站 → 大包卸载超时被强杀 → 包半删）；取证报告 `10-env-baseline\env-incident_20260919_root-cause.md` |
 
 ## 时间戳规则 v3（三层锚点）
 

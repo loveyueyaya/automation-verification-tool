@@ -1,0 +1,103 @@
+环境全面检测报告  2026-09-19 05:50:21
+解释器: C:\Program Files\Python313\python.exe
+
+==============================================================================
+1. Python 库（项目实际调用面）
+==============================================================================
+--- 1.1 项目源码直接 import 的库（实跑功能调用）---
+  ✅ PIL                          35.4 ms  size=(32, 16) mode=RGB
+  ✅ cv2                          54.3 ms  ver=4.10.0 match=1.000 imencode=True ximgproc=True
+  ✅ dxcam                       355.2 ms  frame=(1440, 2560, 3) dtype=uint8
+  ✅ mss                          57.1 ms  size=Size(width=2560, height=1440)
+  ✅ numpy                         0.1 ms  ver=2.3.5 sum=66.0 dot=(3, 3)
+  ✅ psutil                       28.8 ms  ver=7.2.2 procs=229 cpu=32 mem=63.7GB
+  ✅ pynvml                       29.3 ms  total=12282 MiB (走 ocr.py 的预加载路径)
+  ✅ paddle                     3171.3 ms  ver=3.3.1 cuda=True matmul=[[7.0, 10.0], [15.0, 22.0]]
+  ✅ paddleocr                  2336.3 ms  ver=3.7.0
+  ✅ paddlex                       0.0 ms  ver=3.7.2
+
+--- 1.2 已装但项目未直接调用（层5/UIA/配置相关，实跑导入+最小调用）---
+  ✅ comtypes(+client)            36.2 ms  ver=1.4.16 client=OK GetModule=OK
+  ✅ uiautomation                129.8 ms  前台='WorkBuddy' 类型=PaneControl 直接子控件=2
+  ✅ pywinauto                   132.7 ms  ver=0.6.9 Desktop=OK
+  ✅ pywin32(win32gui/api)         0.4 ms  win32gui.EnumWindows=466 win32api=True
+  ✅ PyYAML                        0.2 ms  ver=6.0.2 load={'a': 1}
+  ✅ requests                      0.0 ms  ver=2.34.2 Session=OK
+  ✅ openpyxl                      0.5 ms  ver=3.1.5 cell=1
+  ✅ python-dateutil               0.1 ms  parse=2026-09-19 04:00:00
+  ✅ pycryptodome                 12.5 ms  AES 模块可用
+  ✅ protobuf                     17.8 ms  序列化 3 字节
+  ✅ colorlog                      0.0 ms  ColoredFormatter=True
+  ✅ colorama                      0.1 ms  init/deinit OK
+  ✅ huggingface_hub               0.0 ms  ver=1.31.0
+
+==============================================================================
+2. 外部命令与进程（subprocess 调用面）
+==============================================================================
+  ✅ nvidia-smi             78 ms  rc=0  NVIDIA GeForce RTX 4080 Laptop GPU, 12282 MiB, 616.56
+  ✅ taskkill /?            14 ms  rc=0  (帮助输出 2116 字节)
+  ✅ pynvml 取显存        14.0 ms（替代 nvidia-smi 的路径）
+  ⚠ WgcCapture.exe    不存在（截图第一档 WGC 不可用 → 走 dxcam/mss，属已知状态）
+  ℹ 项目用 sys.executable 作为子进程解释器（uitool.py PY = sys.executable）→ 用哪个解释器启动就必须全程一致
+
+==============================================================================
+3. 冲突检测
+==============================================================================
+--- 3.1 pip check ---
+  ⚠ paddlepaddle-gpu 3.3.1 has requirement nvidia-cudnn-cu12==9.5.1.17, but you have nvidia-cudnn-cu12 9.9.0.52.
+
+--- 3.2 同名包/多版本/僵尸元数据 ---
+  多版本共存: 无
+  ~ 前缀僵尸元数据: 无
+
+--- 3.3 共享命名空间/依赖互斥风险 ---
+  ℹ opencv-python + opencv-contrib-python → 同时存在，版本一致
+  ✅ paddlepaddle(CPU) + paddlepaddle-gpu → 仅 ['paddlepaddle-gpu']
+
+--- 3.4 nvidia CUDA 依赖 vs paddlepaddle-gpu 要求 ---
+  nvidia-cudnn-cu12            实装=9.9.0.52
+  nvidia-cublas-cu12           实装=12.6.4.1
+  nvidia-cuda-runtime-cu12     实装=12.6.77
+  nvidia-cufft-cu12            实装=11.3.0.4
+  nvidia-curand-cu12           实装=10.3.7.77
+  nvidia-cusparse-cu12         实装=12.5.4.2
+
+--- 3.5 解释器/路径冲突 ---
+  项目解释器      : C:\Program Files\Python313\python.exe (True)
+  PATH 裸 python  : C:\Users\Administrator\.workbuddy\binaries\python\versions\3.13.12\python.EXE
+  PATH 裸 python3 : C:\Users\Administrator\.workbuddy\binaries\python\versions\3.13.12\python3.EXE
+  当前 sys.executable: C:\Program Files\Python313\python.exe
+  → 裸 python 与项目解释器不同即为已知坑（一律用绝对路径）
+
+--- 3.6 site-packages 中的冲突副作用文件 ---
+  comtypes/gen                       存在
+  comtypes/gen/__init__.py           存在
+  six.py                             存在
+  pynvml.py                          存在
+  nvidia_smi.py                      存在
+  cv2/py.typed                       存在
+  distutils-precedence.pth           存在
+  _distutils_hack                    存在
+
+--- 3.7 已注册杀软 / Defender / 冲突软件 ---
+  注册杀软: (空，未注册)
+
+==============================================================================
+4. 功能异常扫描
+==============================================================================
+--- 4.1 导入期告警（warnings）---
+  ✅ 无导入期告警
+
+--- 4.2 项目源码已知问题点复检 ---
+  ℹ ocr.py 是否残留 subprocess 调 nvidia-smi
+  ⚠ shot.py 区域截图修复标记 _region_box
+  ⚠ ocr.py OCR 单例 get_ocr
+  ⚠ uitool.py 子进程用 sys.executable
+
+--- 4.3 环境侧已知缺陷（对照盘点/日报，逐项复验）---
+  BUG-4 framework 污染: framework='wujie' security='wujie' → 仍存在（framework 被安全软件名污染）
+  BUG-2 env_adapter 可被显式导入: 否
+
+--- 4.4 磁盘/内存余量 ---
+  C:/ 总 200 GB / 剩余 71 GB (64% 已用)
+  F:/ 总 1908 GB / 剩余 989 GB (48% 已用)

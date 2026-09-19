@@ -84,11 +84,13 @@ temp-cache/
 }
 ```
 
-## 加载与备份说明（实测结论 2026-09-17）
+## 加载与备份说明（实测更新 2026-09-19）
 
-- **加载方式**：技能经 AppData `.user_skills` junction → F 盘权威源加载（每轮对话自动注入技能列表，无需手动点击）。权威源即加载源。
-- **`.skills` 系统技能目录不可用于自定义技能镜像**：已实测（2026-09-17）复制镜像后数分钟内被豆包系统清理（108 个官方技能库，系统管理移除非官方内容）；junction 方案更危险（被清理时递归删除权威源内容，曾连带清空 feedback-logger 权威源）。请勿在 `.skills` 下放置自定义技能。
-- **更新技能**：直接改权威源（`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\cache-manager\`），junction 自动同步到 AppData，下轮对话生效。
+- **加载方式**：AppData 加载目录 `C:\Users\Administrator\.workbuddy\skills\` 下为**实体目录副本**（2026-09-19 实测：`GetFileAttributesW` 无 `FILE_ATTRIBUTE_REPARSE_POINT`，`os.path.islink` 为 False —— **不是 junction、不是符号链接**）。因此**改权威源后必须同步复制到 AppData 才在下一轮生效**。
+- **同步校验**：改完权威源 → 复制到 AppData → 用 SHA256 逐文件比对，两边一致才算同步成功（比对方法见 `SKILLS_INDEX.md`）。
+- **缓存根唯一**：`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\cache-manager\temp-cache\`（硬编码在 `scripts/make_cache.py` 的 `CACHE_ROOT`；AppData 侧 `temp-cache` 不再作为缓存根，历史副本已合并回权威源）。
+- **`.skills` 系统技能目录不可用于自定义技能镜像**：已实测（2026-09-17）复制镜像后数分钟内被系统清理（108 个官方技能库，系统管理移除非官方内容）；junction 方案更危险（被清理时递归删除权威源内容，曾连带清空 feedback-logger 权威源）。请勿在 `.skills` 下放置自定义技能。
+- **更新技能**：改权威源（`F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\cache-manager\`）→ 同步到 AppData → SHA256 校验，下轮对话生效。
 
 ## 资源
 

@@ -1,0 +1,99 @@
+# -*- coding: utf-8 -*-
+"""补齐丢失的 nvidia CUDA DLL，并在同一进程内立即验证 paddle/OCR（避免再次被清理）。"""
+import os
+import subprocess
+import tempfile
+import time
+import zipfile
+
+PY = r"C:\Program Files\Python313\python.exe"
+SP = r"C:\Program Files\Python313\Lib\site-packages"
+
+PKGS = [
+    ("nvidia-cuda-runtime-cu12", "12.6.77"),
+    ("nvidia-cublas-cu12", "12.6.4.1"),
+    ("nvidia-cudnn-cu12", "9.9.0.52"),
+    ("nvidia-cufft-cu12", "11.3.0.4"),
+    ("nvidia-curand-cu12", "10.3.7.77"),
+    ("nvidia-cusparse-cu12", "12.5.4.2"),
+    ("nvidia-nvjitlink-cu12", "12.9.86"),
+]
+
+
+def need(pkg):
+    # 简单判断：对应 nvidia/<子包>/bin 是否存在 DLL
+    sub = pkg.replace("nvidia-", "").replace("-cu12", "").replace("-", "_")
+    d = os.path.join(SP, "nvidia", sub, "bin")
+    if not os.path.isdir(d):
+        return True
+    return not any(f.endswith(".dll") for f in os.listdir(d))
+
+
+restored = []
+for pkg, ver in PKGS:
+    if not need(pkg):
+        print(f"[跳过] {pkg} 已有 DLL", flush=True)
+        continue
+    print(f"[下载] {pkg}=={ver} ...", flush=True)
+    d = tempfile.mkdtemp(prefix="cuda_")
+    r = subprocess.run([PY, "-m", "pip", "download", "--no-deps", "--no-cache-dir",
+                        "-d", d, f"{pkg}=={ver}"], capture_output=True, text=True, timeout=3000)
+    whls = [os.path.join(d, f) for f in os.listdir(d) if f.endswith(".whl")]
+    if not whls:
+        print(f"   !! 失败 rc={r.returncode} {(r.stderr or '')[-150:]}", flush=True)
+        continue
+    whl = whls[0]
+    print(f"   -> {os.path.basename(whl)} ({os.path.getsize(whl)//1024//1024} MB)", flush=True)
+    tmp = tempfile.mkdtemp(prefix="cudaz_")
+    with zipfile.ZipFile(whl) as z:
+        z.extractall(tmp)
+    n = 0
+    for root, _, fs in os.walk(tmp):
+        for fn in fs:
+            if not fn.endswith((".dll", ".py")):
+                continue
+            src = os.path.join(root, fn)
+            rel = os.path.relpath(src, tmp).replace("/", os.sep)
+            if rel.endswith("RECORD"):
+                continue
+            dst = os.path.join(SP, rel)
+            if os.path.exists(dst):
+                continue
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with open(src, "rb") as a, open(dst, "wb") as b:
+                b.write(a.read())
+            n += 1
+    print(f"   写入 {n} 个文件", flush=True)
+    restored.append(pkg)
+
+print("\n补齐完成:", restored, flush=True)
+
+# ---- 立即验证 ----
+print("\n=== 立即验证 paddle / OCR ===", flush=True)
+t0 = time.perf_counter()
+try:
+    import paddle
+    print(f"paddle {paddle.__version__} | CUDA: {paddle.device.is_compiled_with_cuda()} "
+          f"({(time.perf_counter()-t0)*1000:.0f} ms)", flush=True)
+except Exception as e:
+    print("paddle 失败:", type(e).__name__, str(e)[:200], flush=True)
+    raise SystemExit(1)
+
+import sys
+sys.path.insert(0, r"F:\自动化验证工具\04-implementation\P1-contracts-env-adapter\scripts")
+import ocr
+t0 = time.perf_counter(); o1 = ocr.get_ocr(); t1 = (time.perf_counter() - t0) * 1000
+t0 = time.perf_counter(); o2 = ocr.get_ocr(); t2 = (time.perf_counter() - t0) * 1000
+print(f"get_ocr 首次: {t1:.0f} ms | 复用: {t2:.4f} ms | 同一实例: {o1 is o2}", flush=True)
+
+t0 = time.perf_counter()
+r = subprocess.run([PY, os.path.join(r"F:\自动化验证工具\04-implementation\P1-contracts-env-adapter\scripts", "shot.py"),
+                    "--out", r"F:\wordbuddy\2026-09-18-21-23-01\_smp.png", "--region", "600,300,640,360"],
+                   capture_output=True, text=True, timeout=300)
+print("截图:", r.stdout.strip().splitlines()[-1], flush=True)
+for i in range(3):
+    t = time.perf_counter()
+    items = ocr.recognize(o1, r"F:\wordbuddy\2026-09-18-21-23-01\_smp.png")
+    print(f"  第{i+1}次 recognize: {(time.perf_counter()-t)*1000:.1f} ms, {len(items)} 条", flush=True)
+os.remove(r"F:\wordbuddy\2026-09-18-21-23-01\_smp.png")
+print("验证结束")

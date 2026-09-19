@@ -1,0 +1,229 @@
+目录整理全量逐项验证报告 v2  2026-09-19 05:48:36
+
+====================================================================================
+1. 根目录归位清单逐项验证
+====================================================================================
+  ✅ RELEASE_NOTES_INDEX.md → 06-deployment\RELEASE_NOTES_INDEX.md 源已移除=True 目标在位=True
+  ✅ RELEASE_NOTES_v1.md → 06-deployment\RELEASE_NOTES_v1.md    源已移除=True 目标在位=True
+  ✅ P1_patch1_release_notes.md → 06-deployment\P1_patch1_release_notes.md 源已移除=True 目标在位=True
+  ✅ P1-pyc-cache-backup → 06-deployment\P1-pyc-cache-backup    源已移除=True 目标在位=True
+  ✅ P1_acceptance_evidence.zip → 05-tests\P1_acceptance_evidence.zip 源已移除=True 目标在位=True
+  ✅ git-sync.ps1 → 07-operations\git-sync.ps1                  源已移除=True 目标在位=True
+  ✅ sync-to-github.bat → 07-operations\sync-to-github.bat      源已移除=True 目标在位=True
+  ✅ HANDOVER.md → 11-management\HANDOVER.md                    源已移除=True 目标在位=True
+  ✅ project-phase-progress.xlsx → 11-management\project-phase-progress.xlsx 源已移除=True 目标在位=True
+  ✅ 根级已无 决策日志                                                  
+  ✅ 根级已无 同步到GitHub.bat                                         
+  ✅ 根级已无 项目阶段进度表.xlsx                                          
+  ✅ 根目录除白名单外无散落项                                               多余=无
+  ✅ 保留项 README.md 在位                                           
+  ✅ 保留项 LICENSE 在位                                             
+
+====================================================================================
+2. 目录树 00~11 + 各目录索引 + 新增子目录
+====================================================================================
+  ✅ 目录 00-* 唯一存在                                               00-doubao-llm-prerequisites
+  ✅ 目录 01-* 唯一存在                                               01-requirements
+  ✅ 目录 02-* 唯一存在                                               02-architecture
+  ✅ 目录 03-* 唯一存在                                               03-detailed-design
+  ✅ 目录 04-* 唯一存在                                               04-implementation
+  ✅ 目录 05-* 唯一存在                                               05-tests
+  ✅ 目录 06-* 唯一存在                                               06-deployment
+  ✅ 目录 07-* 唯一存在                                               07-operations
+  ✅ 目录 08-* 唯一存在                                               08-review-logs
+  ✅ 目录 09-* 唯一存在                                               09-feedback
+  ✅ 目录 10-* 唯一存在                                               10-env-baseline
+  ✅ 目录 11-* 唯一存在                                               11-management
+  ✅ 00-doubao-llm-prerequisites/doubao-prerequisites-index.md  
+  ✅ 01-requirements/requirements-index.md                      
+  ✅ 04-implementation/implementation-index.md                  
+  ✅ 05-tests/tests-index.md                                    
+  ✅ 06-deployment/deployment-index.md                          
+  ✅ 07-operations/operations-index.md                          
+  ✅ 08-review-logs/INDEX.md                                    
+  ✅ 09-feedback/INDEX.md                                       
+  ✅ 10-env-baseline/env-baseline-index.md                      
+  ✅ 11-management/management-index.md                          
+  ✅ 10-env-baseline/_tools                                     
+  ✅ 10-env-baseline/_evidence                                  
+  ✅ 10-env-baseline/_local_assets                              
+  ✅ _tools/legacy_repair 存在                                    19 项
+
+====================================================================================
+3. 全树旧路径/旧名残留扫描（活文档必须 0 命中）
+====================================================================================
+  扫描文件 132；活文档命中 0（要求 0）；历史/说明性命中 27（允许）
+    ⚪ 05-tests\P1_验收证据_20260916_195623.md:18 [0运行环境报告]
+    ⚪ 05-tests\P1_验收证据_20260916_195623.md:44 [同步到GitHub\.bat]
+    ⚪ 05-tests\P1_验收证据_20260916_195623.md:45 [项目阶段进度表\.xlsx]
+    ⚪ 05-tests\P1_验收证据_20260916_195623.md:50 [同步到GitHub\.bat]
+    ⚪ 05-tests\P1_验收证据_20260916_195623.md:50 [项目阶段进度表\.xlsx]
+    ⚪ 10-env-baseline\_tools\reorganize_batch3.py:11 [wordbuddy[\\/]2026-09-18-21-23-01]
+    ⚪ 10-env-baseline\_tools\update_refs2.py:22 [wordbuddy[\\/]2026-09-18-21-23-01]
+    ⚪ 10-env-baseline\_tools\update_refs2.py:27 [_investigation]
+  ✅ 活文档无旧路径/旧名残留                                               命中 0
+
+====================================================================================
+4. 全树「项目内路径引用」逐条存在性校验
+====================================================================================
+  去重后项目内引用 54 条：存在 43 / 白名单 11 / 缺失 0
+    ⚪ 白名单 F:\自动化验证工具\.cache ← 详细设计中的示例缓存路径（从未创建）
+    ⚪ 白名单 F:\自动化验证工具\00-doubao-llm-prerequisites\.user_skills\cache-manager\temp-cache\20260916_223000 ← 技能 SKILL.md 里的缓存路径示例值（实际缓存见同目录其他时间戳）
+    ⚪ 白名单 F:\自动化验证工具\09-feedback\daily\feedback_YYYYMMDD.md ← 占位符/外部文件
+    ⚪ 白名单 F:\自动化验证工具\09-feedback\issues\issue_NNN_ ← 占位符/外部文件
+    ⚪ 白名单 F:\自动化验证工具\4代码实现\P1_契约与环境适配层 ← P1 时期历史目录名
+    ⚪ 白名单 F:\自动化验证工具\4代码实现\P1_契约与环境适配层\ ← P1 时期历史目录名
+    ⚪ 白名单 F:\自动化验证工具\4代码实现\P1_契约与环境适配层\MIGRATION.md ← P1 时期历史目录名
+    ⚪ 白名单 F:\自动化验证工具\4代码实现\P1_契约与环境适配层\scripts\shot.py ← P1 时期历史目录名
+    ⚪ 白名单 F:\自动化验证工具\4代码实现\P1_契约与环境适配层\tests\test_rebuild_equiv.py ← P1 时期历史目录名
+    ⚪ 白名单 F:\自动化验证工具\4代码实现\P1_契约与环境适配层\证据 ← P1 时期历史目录名
+    ⚪ 白名单 F:\自动化验证工具\P1_pyc缓存备份_20260916 ← 历史中文目录名（现 06-deployment/P1-pyc-cache-backup）
+  ✅ 项目内路径引用全部存在（白名单除外）                                         缺失 0
+
+====================================================================================
+5. 各目录索引条目逐条存在性校验（四级解析 + 目录名解析）
+====================================================================================
+  00-doubao-llm-prerequisites/doubao-prerequisites-index.md 可校验 5 条
+  01-requirements/requirements-index.md                  可校验 0 条
+  04-implementation/implementation-index.md              可校验 7 条
+  05-tests/tests-index.md                                可校验 0 条
+  06-deployment/deployment-index.md                      可校验 1 条
+  07-operations/operations-index.md                      可校验 0 条
+  08-review-logs/INDEX.md                                可校验 0 条
+  09-feedback/INDEX.md                                   可校验 3 条
+  10-env-baseline/env-baseline-index.md                  可校验 64 条
+  11-management/management-index.md                      可校验 11 条
+  README.md                                              可校验 13 条
+  ✅ 索引条目全部解析到真实文件                                              校验 104 / 失败 0
+
+====================================================================================
+6. README 目录结构表逐行 vs 实际目录
+====================================================================================
+  ✅ README 目录行 = 实际目录                                          差集=无
+   README: 00-doubao-llm-prerequisites, 01-requirements, 02-architecture, 03-detailed-design, 04-implementation, 05-tests, 06-deployment, 07-operations, 08-review-logs, 09-feedback, 10-env-baseline, 11-management
+
+====================================================================================
+7. 技能权威源 ↔ AppData 逐文件 SHA256
+====================================================================================
+  ✅ 技能 cache-manager 逐文件一致                                     2 文件
+  ✅ 技能 computer-use-automation 逐文件一致                           1 文件
+  ✅ 技能 feedback-logger 逐文件一致                                   2 文件
+  ✅ 技能 local-dev-environment 逐文件一致                             3 文件
+  ✅ 技能 parallel-serial-decider 逐文件一致                           4 文件
+  ✅ 五技能全部逐文件一致                                                 
+
+====================================================================================
+8. .gitignore 逐项 check-ignore 期望
+====================================================================================
+  ✅ 忽略 HANDOVER.md                                             
+  ✅ 忽略 11-management/HANDOVER.md                               
+  ✅ 忽略 P1_acceptance_evidence.zip                              
+  ✅ 忽略 05-tests/P1_acceptance_evidence.zip                     
+  ✅ 忽略 P1_patch1_release_notes.md                              
+  ✅ 忽略 06-deployment/P1_patch1_release_notes.md                
+  ✅ 忽略 06-deployment/P1-pyc-cache-backup                       
+  ✅ 忽略 .workbuddy                                              
+  ✅ 忽略 10-env-baseline/_local_assets                           
+  ✅ 忽略 10-env-baseline/_local_assets/_wheels                   
+  ✅ 入库 README.md                                               
+  ✅ 入库 LICENSE                                                 
+  ✅ 入库 .gitignore                                              
+  ✅ 入库 06-deployment/RELEASE_NOTES_INDEX.md                    
+  ✅ 入库 06-deployment/RELEASE_NOTES_v1.md                       
+  ✅ 入库 07-operations/git-sync.ps1                              
+  ✅ 入库 07-operations/sync-to-github.bat                        
+  ✅ 入库 11-management/project-phase-progress.xlsx               
+  ✅ 入库 11-management/management-index.md                       
+  ✅ 入库 10-env-baseline/_tools/verify_reorg.py                  
+  ✅ .gitignore 逐项期望成立                                          
+
+====================================================================================
+9. git 逐重命名核对 + 删除计数
+====================================================================================
+  重命名/移动记录 16 条：
+    R  "01-requirements/0\350\277\220\350\241\214\347\216\257\345\242\203\346\212\245\345\221\212/\350\277\220\350\241\214\347\216\257\345\242\2
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/compare_deps_pyc.py" -> 04-implementation/P1-contracts-env-adapter/e
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/compare_pyc.py" -> 04-implementation/P1-contracts-env-adapter/eviden
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/diff_deps_pyc.py" -> 04-implementation/P1-contracts-env-adapter/evid
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/diff_pyc.py" -> 04-implementation/P1-contracts-env-adapter/evidence/
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/dump_full_dis.py" -> 04-implementation/P1-contracts-env-adapter/evid
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/dump_shot_get_engine.py" -> 04-implementation/P1-contracts-env-adapt
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/full_dis_out.txt" -> 04-implementation/P1-contracts-env-adapter/evid
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/\345\256\241\350\256\241\346\227\245\345\277\227_\346\255\245\351\25
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/\345\256\241\350\256\241\346\227\245\345\277\227_\346\255\245\351\25
+    R  "04-implementation/P1-contracts-env-adapter/\350\257\201\346\215\256/\345\256\241\350\256\241\346\227\245\345\277\227_\346\255\245\351\25
+    RM RELEASE_NOTES_INDEX.md -> 06-deployment/RELEASE_NOTES_INDEX.md
+    RM RELEASE_NOTES_v1.md -> 06-deployment/RELEASE_NOTES_v1.md
+    R  git-sync.ps1 -> 07-operations/git-sync.ps1
+    R  "\345\220\214\346\255\245\345\210\260GitHub.bat" -> 07-operations/sync-to-github.bat
+    R  "\351\241\271\347\233\256\351\230\266\346\256\265\350\277\233\345\272\246\350\241\250.xlsx" -> 11-management/project-phase-progress.xlsx
+  ✅ 无删除（D=0）                                                   D=0
+  ✅ 重命名/移动 ≥ 8 条                                               16 条
+
+====================================================================================
+10. _tools 与 legacy_repair 逐脚本：编译 + 实跑
+====================================================================================
+  -- 10-env-baseline\_tools --
+  ✅ analyze_waves.py 编译+实跑                                     rc=0 ==================================================
+  ✅ assess_damage.py 编译+实跑                                     rc=0 当前缺失文件总数: 5295
+  ✅ attribute_waves.py 编译+实跑                                   rc=0 当前缺失文件总数: 5295
+  ✅ check_metadata.py 编译+实跑                                    rc=0 === 1. dist-info 无 RECORD（pip uninstall / 依赖审计会失准）
+  ✅ damage_check.py 编译+实跑                                      rc=0 site-packages 回收条目: 29701（当前仍存在 24406 / 当前缺失 5295）
+  ✅ final_assessment.py 编译+实跑                                  rc=0 === A. 总量 ===
+  ✅ list_core_damage.py 编译+实跑                                  rc=0 扫描模式: ['C:\\$RECYCLE.BIN\\*', 'F:\\$RECYCLE.BIN\\*
+  ✅ probe_symbols.py 编译+实跑                                     rc=0 DLL        Symbol                          WinDLL(
+  ✅ recycle_forensics.py 编译+实跑                                 rc=0 回收站目录数: 18
+  ✅ reorganize_batch3.py 编译+实跑                                 rc=0 === 1) 修复/探针脚本 → 10-env-baseline/_tools/legacy_rep
+  ✅ reorganize_root.py 编译+实跑                                   rc=0 === 执行计划（9 项）===
+  ✅ restore_from_recycle.py 编译                                 （无实跑规格）
+  ✅ restore_from_wheels.py 编译                                  （无实跑规格）
+  ✅ sample_noext.py 编译+实跑                                      rc=0 无扩展名真实缺失条目数: 570
+  ✅ update_refs.py 编译+实跑                                       rc=0 === 已更新引用的活文档（0 个）===
+  ✅ update_refs2.py 编译+实跑                                      rc=0 === 已更新引用的活文档（0 个）===
+  ✅ update_refs3.py 编译+实跑                                      rc=0 === 已更新引用的活文档（0 个）===
+  ✅ verify_e2e.py 编译+实跑                                        rc=0 ==================================================
+  ✅ verify_env_full.py 编译+实跑                                   rc=0 环境全面检测报告  2026-09-19 05:50:21
+  ✅ verify_packages.py 编译+实跑                                   rc=0 === 外围缺失文件 扩展名分布 ===
+  ✅ verify_reorg.py 编译                                         （无实跑规格）
+  ✅ verify_win32_api.py 编译+实跑                                  rc=0 DLL        API                          判定        
+  ✅ watch_files.py 编译+实跑                                       rc=0 [2026-09-19T05:50:41] cv2=122 paddle=3499 dxcam=30
+  -- 10-env-baseline\_tools\legacy_repair --
+  ✅ _probe_step3.py 编译                                         
+  ✅ probe_libs.py 编译                                           
+  ✅ probe_ocr_tuning.py 编译                                     
+  ✅ probe_uia_deep.py 编译                                       
+  ✅ probe_uia_foreground.py 编译                                 
+  ✅ reorganize_batch2.py 编译                                    
+  ✅ repair_env.py 编译                                           
+  ✅ repair_env2.py 编译                                          
+  ✅ repair_env3.py 编译                                          
+  ✅ repair_env4_metadata.py 编译                                 
+  ✅ repair_env5_autofix.py 编译                                  
+
+====================================================================================
+11. 功能回归（逐项实跑）
+====================================================================================
+  ✅ 56 单测                                                      ---------------------------------------------------------------------- | Ran 56 tests in 0.348s | OK
+  ✅ 关键模块导入（28）                                                 BAD: []
+  ✅ pip check 告警 ⊆ 已知基线                                        共 1 条，非基线 0 条
+  ✅ 区域截图 320×200                                               
+  ✅ 模板匹配 confidence=1.0                                        
+
+====================================================================================
+12. 本地资产 / 遗留脚本归位专项
+====================================================================================
+  ✅ _local_assets/_wheels                                      54 文件
+  ✅ _local_assets/_backup_opencv_stale                         1028 文件
+  ✅ legacy_repair 共 18 项（11 脚本 + 4 无扩展名脚本 + 3 清单）              py=11 其他=7 合计=18
+  ✅ 工作目录已清空（仅 .workbuddy）                                      ['.workbuddy']
+  ✅ 10 索引登记 _tools                                             
+  ✅ 10 索引登记 _evidence                                          
+  ✅ 10 索引登记 _local_assets                                      
+  ✅ 10 索引登记 legacy_repair                                      
+
+====================================================================================
+汇总
+====================================================================================
+  判定项合计 121：通过 121 / 失败 0
+  ✅ 全部通过
+  耗时 129.5 s
