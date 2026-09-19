@@ -10,7 +10,7 @@
 | `tests-index.md` | 本目录索引 |
 | `P1_验收证据_20260916_195623.md` | P1 阶段验收证据：完整文件树（33 跟踪文件）、27 用例全量 -v 输出、字符串搜索结果、MIGRATION 全文快照 |
 | `P2-1_依赖清理与BUG修复_验收报告.md` | P2-1 验收：OpenCV 收敛（contrib 必留的实测依据）/ pynvml 替换 / BUG-1 区域截图 / BUG-3 OCR 常驻，含变更文件清单 |
-| `P2-2_分层迁移_验收报告.md` | P2-2 验收：contracts+env_adapter 迁移至 P2-layers 全部实测（目录结构 find 输出、16 文件行数比对）、环境事故与 git mv 规避结论 |
+| `P2-2_分层迁移_验收报告.md` | P2-2 验收：contracts+env_adapter 迁移至 P2-layers 全部实测（目录结构 find 输出、16 文件行数比对）、环境事故与 git mv 规避结论；**§5 收尾补记：收尾清单 5 项遗留全部闭环** |
 | `P1_acceptance_evidence.zip` | P1 验收证据包（**本地副本，不入库**；同名资产已上传 GitHub Release `ui-toolbox-P1-20260916`） |
 
 ## 相关文档

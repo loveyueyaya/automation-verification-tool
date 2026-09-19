@@ -12,7 +12,7 @@
 | `timeline.jsonl` | 事件流，append-only，每行一条 JSON（ts/ts_source/type/subject/evidence/action/result/git_commit）；写入用 feedback-logger 技能的 `log_event.py` |
 | `daily\feedback_20260916.md` | 09-16 日报：P1 开发+重建（问题 5 / 解决 4 / 遗留 1） |
 | `daily\feedback_20260917.md` | 09-17 日报：P1 复核+补丁（问题 3 / 解决 3 / 遗留 0） |
-| `daily\feedback_20260919.md` | 09-19 日报：P2-1 修复、P2-2 迁移、清理 CPU 版 paddle、环境全检、**文件丢失根因取证**、目录整理、凭证落地（system 锚点即时写入，最完整的一天） |
+| `daily\feedback_20260919.md` | 09-19 日报：P2-1 修复、P2-2 迁移+**收尾 5 项闭环**、清理 CPU 版 paddle、环境全检、**文件丢失根因取证**、目录整理、凭证落地、**晚间会话：index 逐文件化+目录消失事件+恢复+SACL 加固**（§6，system 锚点即时写入，最完整的一天） |
 | `issues\issue_001_pyc_cache_dir.md` | 遗留 001：中文目录导致 GitHub URL 编码失败 —— **已解决**（目录全英文化） |
 | `issues\issue_002_site-packages-file-loss.md` | 遗留 002：site-packages 包文件批量丢失 —— **根因已定位**（genie-trash 回收站删除 × pip 强杀 → 包半删）；损失评估结论=不恢复（详见 `10-env-baseline\env-damage-assessment_20260919.md`） |
 | `issues\issue_003_env-metadata-residue.md` | 遗留 003：环境元数据残留（C1 僵尸 opencv dist-info / C2 pynvml 元数据缺失）—— **已处置**（C1 删除、C2 回收站原样恢复；复验一致） |

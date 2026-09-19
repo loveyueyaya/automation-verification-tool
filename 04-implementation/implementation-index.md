@@ -25,4 +25,4 @@
 - 01-requirements/（需求）、02-architecture/（架构）、05-tests/（验收证据）
 
 
-> **2026-09-19 19:5x 收尾完成**：#1 调用方 import 已指向 P2-layers（7 文件，含 UITOOL_CONTRACTS_SOURCE=p1/p2 flag）｜#2 shim 已删｜#3 本目录改名 P1-toolbox-legacy｜#4 restore_p1_shim.py + flag 闭环已验证｜#5 BUG-2 接线（uitool see → env_profile 入审计）+ BUG-4 修复（FRAMEWORK_RULES 声明式）。全程 56 单测 5 次全绿。
+> **2026-09-19 19:5x 收尾完成**：#1 调用方 import 已指向 P2-layers（7 文件，含 UITOOL_CONTRACTS_SOURCE=p1/p2 flag）｜#2 shim 已删｜#3 本目录改名 P1-toolbox-legacy｜#4 restore_p1_shim.py + flag 闭环已验证｜#5 BUG-2 接线（uitool see → env_profile 入审计）+ BUG-4 修复（FRAMEWORK_RULES 声明式）。全程 56 单测 5 次全绿。已随提交 `028ffc2` 推送（文档笔 `f2bf819`、取证笔 `a580e75`，远端 main = a580e75）。`timeline\_test_bug2\` 为 BUG-2 接线的实跑验证证据。
