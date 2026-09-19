@@ -159,3 +159,11 @@ F:\自动化验证工具\
 1. 第 5 节第 1/2 项（`contracts` shim 重复、P1 目录名名不副实）建议留到 **P2-2 收尾**一起做 —— 属代码结构调整，需你点头后才动。
 2. `10-env-baseline\_local_assets\`（wheel 归档 + 旧包备份，约 580 MB）**不入库**，仅本机保留；重建方式：`pip download` 按需重取。
 3. 开发工作仍按你的指示**暂停**，等下一步指令。
+
+---
+
+## 十、补记（2026-09-19 21:5x）
+
+第九节待办 1 **已完成**：contracts shim 去重 + P1 目录改名，随 P2-2 收尾落地——
+`P1-contracts-env-adapter/` 已更名为 **`P1-toolbox-legacy/`**（git mv 保历史），contracts shim 已删除
+（唯一实现 = `P2-layers/contracts/`，一键回退工具 `restore_p1_shim.py`）。详见 05-tests P2-2 验收报告 §5。

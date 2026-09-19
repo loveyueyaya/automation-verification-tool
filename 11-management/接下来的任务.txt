@@ -27,7 +27,7 @@
 | 轮次 | 阶段 | 状态 | 实测依据 |
 | --- | --- | --- | --- |
 | 第1轮 | P2-1 | ✅ 已完成（1 项与规划有出入，见下） | 56 单测全绿；OpenCV 收敛为 2 包；pynvml 替换完成（21ms vs nvidia-smi 147ms）；BUG-1/BUG-3 已修并实跑验证 |
-| 第2轮 | P2-2 | 🟡 基本完成（第 5/7 步未做，已并入收尾清单） | `04-implementation/P2-layers/` 已建（contracts 9 + env_adapter 7）；P1 侧留 shim；56 单测全绿 |
+| 第2轮 | P2-2 | ✅ **已完成（含收尾清单 5 项，2026-09-19 21:4x 闭环）** | `P2-layers/`（contracts 9 + env_adapter 7）+ `P1-toolbox-legacy/`（原 P1 目录已改名，shim 已删、调用方 import 已指 P2-layers、flag restore_p1_shim.py、BUG-2 接线/BUG-4 修复）；56 单测 5 次全绿；三笔提交 f2bf819/028ffc2/a580e75 已推送 |
 | 第3~10轮 | P2-3 / P3-x / P4-x | ⬜ 未启动（暂停中） | — |
 
 环境与工程侧（规划外，09-19 已完成）：文件丢失事故取证与根因定位、覆盖法修复、损失评估（结论不恢复）、
