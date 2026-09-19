@@ -1,16 +1,38 @@
 接下来的规划总览（10轮）
-【本文件更新：2026-09-19 05:2x，依据本机实测；开发暂停中，等待用户指示开工】
+【本文件更新：2026-09-19 17:2x（第二次更新，依据用户裁定 + 本机实测）；P2 系列任务保持暂停】
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-〇、当前进度快照（实测，非规划）
+〇、用户裁定记录（2026-09-19 17:2x）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. **contracts shim 去重 + P1 目录改名 → 并入 P2-2 收尾**（不在暂停期单独动）
+   - 涉事：`04-implementation/P1-contracts-env-adapter/contracts/`（仅 1 个 shim）与 `P2-layers/contracts/`（9 文件）重复；
+     以及 `P1-contracts-env-adapter/` 目录名已名不副实（内含 scripts/tests/evidence）
+   - 落地时机：P2-2 第 5 步（改调用方 import）+ 第 7 步（删 shim）同批执行，避免同一批文件改两遍
+2. **关闭行尾转换** —— 已执行并复验：
+   - 新增 `.gitattributes`：`*.jsonl -text`、`log.txt -text`、`.gitattributes -text`
+   - 仓库级 `git config core.autocrlf false`（系统级 gitconfig 为 true，故按仓库覆盖）
+   - 复验：`git check-attr text` 三项目标文件均为 `unset`；`git add -A` 零 CRLF 告警；工作区无 churn
+3. **P2 系列任务保持暂停**，本文件只更新状态与决定，不启动任何开发动作
+
+附：新增技能 `github-remote`（用户在 00 号文件夹创建）—— 已同步到 AppData 加载目录，凭证存本地忽略目录
+   （`.credentials/` 已被根 `.gitignore` 忽略，`git check-ignore` 复验通过；AppData 侧同步时已排除该目录）。
+   凭证状态更新：第一枚 fine-grained PAT（`github_pat_…`）实测 **401 Bad credentials**（格式合法但被拒，疑似已撤销）；
+   用户随后提供 **classic PAT（`ghp_…`，40 位）** → 实测 **200 OK**，login=loveyueyaya（id 37976486），
+   scopes 含 `repo / workflow / admin:repo_hook / delete_repo` 等 → **当前可用**。
+   ⚠ 该 token 权限偏大（含 delete_repo），建议后续按需收敛为最小集（仓库级 fine-grained PAT：Contents+PR+Actions 读写）。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+〇之二、当前进度快照（实测，非规划）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 | 轮次 | 阶段 | 状态 | 实测依据 |
 | --- | --- | --- | --- |
 | 第1轮 | P2-1 | ✅ 已完成（1 项与规划有出入，见下） | 56 单测全绿；OpenCV 收敛为 2 包；pynvml 替换完成（21ms vs nvidia-smi 147ms）；BUG-1/BUG-3 已修并实跑验证 |
-| 第2轮 | P2-2 | 🟡 基本完成（做法与规划不同，第 5/7 步未做） | `04-implementation/P2-layers/` 已建（contracts 9 + env_adapter 7）；P1 侧留 shim；56 单测全绿 |
-| 第3~10轮 | P2-3 / P3-x / P4-x | ⬜ 未启动 | — |
+| 第2轮 | P2-2 | 🟡 基本完成（第 5/7 步未做，已并入收尾清单） | `04-implementation/P2-layers/` 已建（contracts 9 + env_adapter 7）；P1 侧留 shim；56 单测全绿 |
+| 第3~10轮 | P2-3 / P3-x / P4-x | ⬜ 未启动（暂停中） | — |
 
-环境侧（规划外，09-19 已完成）：文件丢失事故取证与根因定位、覆盖法修复、损失评估（结论不恢复）、API 逐一验证（46 项 0 失败）、环境全面检测、目录树整理、C1/C2 元数据修复。
+环境与工程侧（规划外，09-19 已完成）：文件丢失事故取证与根因定位、覆盖法修复、损失评估（结论不恢复）、
+API 逐一验证（46 项 0 失败）、环境全面检测、目录树整理归类、C1/C2 元数据修复、**整理结果逐项验证 123 项全过**、
+**已提交并推送 GitHub（远端 main = `f5c180c`）**。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 一、第1轮 P2-1（依赖清理 + 阻塞BUG修复）——已完成，含 1 项偏差
@@ -46,11 +68,18 @@
 · 迁移方式：方案 B（P1 侧 `contracts/__init__.py` 改 shim，整体替换 sys.modules），env_adapter 整目录 git mv
 · 已验证：迁移后 56 单测全绿；P2-layers 内 16 个文件行数与迁移前逐一比对一致
 
-未完成（进入下一轮前需补）：
-· 第 5 步：改调用方 import（scripts/locate.py、timeline.py、uitool.py 与 tests 需加 sys.path 引导）
-· 第 7 步：删 shim
-· feature flag（一键切回 P1 旧路径）—— 本轮未实现，**属验收标准缺口，需在下一轮补**
-· BUG-2 / BUG-4 未随迁移处理
+未完成（**用户 2026-09-19 裁定：不再单独立项，全部并入 P2-2 收尾，随 P2-2 解除暂停时一次性做完**）：
+
+**P2-2 收尾清单（暂停解除后按序执行，共 5 项）**
+| # | 事项 | 内容 | 备注 |
+| --- | --- | --- | --- |
+| 1 | 第 5 步：改调用方 import | `scripts/locate.py`、`timeline.py`、`uitool.py` 与 tests 加 sys.path 引导，指向 `P2-layers/` | 与 #3 改名同批做，避免改两遍 |
+| 2 | 第 7 步 / shim 去重 | 删 `P1-contracts-env-adapter/contracts/` 的 shim；契约层唯一实现落在 `P2-layers/contracts/`（9 文件） | 需先 #1 完成，且 56 单测全绿 |
+| 3 | P1 目录改名 | `P1-contracts-env-adapter/` 名不副实（内含 scripts/tests/evidence），改为名副其实的目录名 | 与 #1 同批；改名用 `git mv` 保历史 |
+| 4 | feature flag | 一键切回 P1 旧路径 —— 属验收标准缺口，必须补 | 与 #2 联动（切回时 shim 需可恢复） |
+| 5 | BUG-2 / BUG-4 | env_adapter 零引用、framework 被 wujie 污染 | 未随迁移处理，留在收尾同批 |
+
+执行约束（沿用环境硬规则）：每项完成后跑 56 单测；#1/#3 为 git 写操作，执行前建 cache-manager 快照并按串行策略执行。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 三、第3~10轮（原文保留，待启动）

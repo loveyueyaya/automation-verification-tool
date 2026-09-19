@@ -243,3 +243,10 @@ P1_patch1_release_notes.md
 
 # 本地资产（wheel 归档 / 旧包备份，体积大，不入库；重建方式见同目录 README）
 10-env-baseline/_local_assets/
+
+# ---- 本地凭证：严禁入库（本仓库为 public，一旦提交等于公开泄露）----
+# github-remote 技能的凭证目录（仅本机存放，技能文档说明其用途与轮换方式）
+00-doubao-llm-prerequisites/.user_skills/github-remote/.credentials/
+# 通用：
+**/*.token.local
+**/.env.local

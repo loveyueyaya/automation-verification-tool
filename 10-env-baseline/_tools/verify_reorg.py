@@ -116,7 +116,7 @@ def c1_layout():
         item("%s → %s" % (src, dst), gone and there, "源已移除=%s 目标在位=%s" % (gone, there))
     for old in ("决策日志", "同步到GitHub.bat", "项目阶段进度表.xlsx"):
         item("根级已无 %s" % old, old not in root_now)
-    allow = {"README.md", "LICENSE", ".gitignore", ".git", ".workbuddy"}
+    allow = {"README.md", "LICENSE", ".gitignore", ".gitattributes", ".git", ".workbuddy"}
     extra = [n for n in root_now if n not in allow and not re.match(r"^\d\d-", n)]
     item("根目录除白名单外无散落项", not extra, "多余=%s" % (extra or "无"))
     for n in ("README.md", "LICENSE"):
@@ -284,7 +284,7 @@ def c6_readme():
 def c7_skills():
     sec("7. 技能权威源 ↔ AppData 逐文件 SHA256（技能代码；运行时日志只存权威源）")
     skills = ["cache-manager", "computer-use-automation", "feedback-logger",
-              "local-dev-environment", "parallel-serial-decider"]
+              "github-remote", "local-dev-environment", "parallel-serial-decider"]
     # 运行时日志（decision-log/ 与 log.txt）由脚本写到权威源，AppData 侧不应存在副本
     RUNTIME = ("decision-log", "log.txt")
 
@@ -297,7 +297,8 @@ def c7_skills():
         def tree(r):
             out = {}
             for root, dn, fn in os.walk(r):
-                dn[:] = [d for d in dn if d not in ("temp-cache", "__pycache__")]
+                dn[:] = [d for d in dn
+                         if d not in ("temp-cache", "__pycache__", ".credentials")]
                 for f in fn:
                     if f == "_user_meta.json":
                         continue
@@ -320,7 +321,26 @@ def c7_skills():
         if s == "parallel-serial-decider":
             item("parallel-serial-decider AppData 侧无运行时日志副本", not stale,
                  "残留=%s" % stale if stale else "已单一源化")
-    item("五技能代码全部逐文件一致", allok)
+    item("六技能代码全部逐文件一致", allok)
+    # 凭证安全：github-remote 的 .credentials/ 必须被忽略、且绝不出现在 git 跟踪/暂存中
+    cred_dir = os.path.join(SKILL_SRC, "github-remote", ".credentials")
+    cred_file = os.path.join(cred_dir, "github_token")
+    rel_cred = os.path.relpath(cred_file, BASE).replace("\\", "/")
+    ig = subprocess.run(["git", "check-ignore", "-q", rel_cred], cwd=BASE,
+                        capture_output=True)
+    item("凭证文件被 .gitignore 忽略", ig.returncode == 0,
+         "check-ignore rc=%d" % ig.returncode)
+    tracked = subprocess.run(["git", "ls-files", "--", rel_cred], cwd=BASE,
+                             capture_output=True, text=True, encoding="utf-8",
+                             errors="replace").stdout.strip()
+    cached = subprocess.run(["git", "diff", "--cached", "--name-only"], cwd=BASE,
+                            capture_output=True, text=True, encoding="utf-8",
+                            errors="replace").stdout
+    leak = [l for l in cached.splitlines() if ".credentials" in l or "github_token" in l]
+    item("凭证未进入 git 跟踪/暂存", not tracked and not leak,
+         "tracked=%s 暂存泄漏=%s" % (tracked or "无", leak or "无"))
+    item("凭证文件存在且非空", os.path.isfile(cred_file) and os.path.getsize(cred_file) > 0,
+         "%d 字节" % (os.path.getsize(cred_file) if os.path.isfile(cred_file) else 0))
 
 
 def c8_gitignore():
