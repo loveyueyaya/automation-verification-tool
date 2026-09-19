@@ -1,5 +1,5 @@
 接下来的规划总览（10轮）
-【本文件更新：2026-09-19 17:2x（第二次更新，依据用户裁定 + 本机实测）；P2 系列任务保持暂停】
+【本文件更新：2026-09-19 19:5x（第四次更新：P2 暂停解除，**P2-2 收尾清单 5 项全部完成**，详见第二节末尾"收尾完成记录"）；历史：18:2x 第三次（状态复验）/ 17:2x 第二次（用户裁定）】
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 〇、用户裁定记录（2026-09-19 17:2x）
@@ -33,6 +33,24 @@
 环境与工程侧（规划外，09-19 已完成）：文件丢失事故取证与根因定位、覆盖法修复、损失评估（结论不恢复）、
 API 逐一验证（46 项 0 失败）、环境全面检测、目录树整理归类、C1/C2 元数据修复、**整理结果逐项验证 123 项全过**、
 **已提交并推送 GitHub（远端 main = `f5c180c`）**。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+〇之二·补、新会话状态复验（2026-09-19 18:19~18:2x，只读核验，未启动任何开发动作）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+全部结论来自本机实跑（命令 + 原始输出 + 退出码）：
+
+| 项 | 实测结果 |
+| --- | --- |
+| git | 工作区干净（`git status --porcelain` 零输出）；HEAD = 远端 main = `c66e5d9`（含 17:2x 凭证/行尾/日志四次提交）；tags 仍为 2 个（ui-toolbox-P1-20260916 / P1-patch1-20260917） |
+| 56 单测 | `Ran 56 tests in 0.413s — OK`，退出码 0 |
+| P2-layers | contracts 9 文件 + env_adapter 7 文件在位，与 09-19 迁移记录一致 |
+| P1 shim | `P1-contracts-env-adapter/contracts/__init__.py` 在位（sys.modules 整体替换方案；文件头已注明第 7 步删除时机与回滚方式） |
+| BUG-2（收尾 #5） | 复现确认：`env_adapter` 在 04-implementation 全树**零代码引用**（仅 P2-layers/contracts/enums.py 两处 docstring 提及，无 import） |
+| BUG-4（收尾 #5） | 复现确认：`probe_env()` 实测 `security=wujie` → `focus_reliable=False` → 降级 `HANDLE_POST + MSS`（本轮无窗口调用 framework=None；带窗口时 framework='wujie' 误判待修） |
+| 盘点 v2 存放位置 | 实测已在 `11-management\本地离线自动化测试工具_开发前盘点_v2.md`——第四节参考清单中"待用户确认存放位置"事实上已落地（本轮不改，请用户下次过目时顺手确认） |
+
+结论：**P2-2 收尾清单 5 项的前置条件全部具备**（基线全绿、远端同步、shim/新包结构在位、两个 BUG 可复现）。
+P2 仍处暂停；是否解除并按收尾清单开工，待用户裁定。本轮未改动任何代码，仅更新本文件状态。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 一、第1轮 P2-1（依赖清理 + 阻塞BUG修复）——已完成，含 1 项偏差
@@ -78,6 +96,18 @@ API 逐一验证（46 项 0 失败）、环境全面检测、目录树整理归�
 | 3 | P1 目录改名 | `P1-contracts-env-adapter/` 名不副实（内含 scripts/tests/evidence），改为名副其实的目录名 | 与 #1 同批；改名用 `git mv` 保历史 |
 | 4 | feature flag | 一键切回 P1 旧路径 —— 属验收标准缺口，必须补 | 与 #2 联动（切回时 shim 需可恢复） |
 | 5 | BUG-2 / BUG-4 | env_adapter 零引用、framework 被 wujie 污染 | 未随迁移处理，留在收尾同批 |
+
+**✅ 收尾完成记录（2026-09-19 19:4x~19:5x，暂停解除后一次执行）**
+
+| # | 结果 | 验证 |
+| --- | --- | --- |
+| 1 | 调用方 import 指向 P2-layers：`scripts/locate.py`、`timeline.py`、`uitool.py` + `tests/` 4 文件（相对路径引导，改名免疫），并埋入 feature flag：环境变量 `UITOOL_CONTRACTS_SOURCE=p1\|p2`（默认 p2） | 56 单测全绿 0.449s |
+| 2 | shim 已删除（改用 python os.remove，规避 `git rm` 触发点——见下"目录消失事件"）；契约层唯一实现 = `P2-layers/contracts/` | 56 全绿 0.372s；`import contracts` 实测解析自 P2-layers |
+| 3 | `P1-contracts-env-adapter/` → **`P1-toolbox-legacy/`**（git mv 保历史；删 shim 后原名名不副实） | 56 全绿 0.351s |
+| 4 | feature flag 闭环：`restore_p1_shim.py`（git 历史提取优先，内置全文兜底）→ p1 模式 56 全绿 → `--remove` → p2 模式 56 全绿 | restore 实测命中 `1ae52c5` |
+| 5 | **BUG-2 接线**：`uitool.see()` 调 env_adapter.env_probe，探测结果（security/framework/focus_reliable/input_method/capture_method/dpi）写入审计时间线（实跑验证：timeline step=env_profile 含完整 JSON）；**BUG-4 修复**：env_probe 改声明式 `FRAMEWORK_RULES`（framework 只由目标窗口自身进程判定；security 只影响 focus_reliable），实跑验证 framework 不再恒为 wujie | 56 全绿 0.353s + 实跑 |
+
+**⚠ 事件记录：目录消失与审计盲区（2026-09-19 19:50）**：首次执行 #2 用 `git rm` 删 shim 后，`04-implementation` 整目录从磁盘消失（硬删，回收站 0 条；当时 F 盘项目目录无删除审计，删除者无法定位）。已 `git checkout HEAD` 完整恢复（零丢失），改用 python os.remove 后 #2 顺利完成。**防护已补齐**：给 `F:\自动化验证工具` 全树设置可继承 Delete 审计 SACL（Everyone，成功+失败，含子目录文件）——今后任何删除都会在安全日志留 4663 事件（含进程名）。证据：`10-env-baseline\_evidence\09b_project_sacl_20260919.txt`；收尾前快照：`temp-cache\20260919_194705`。
 
 执行约束（沿用环境硬规则）：每项完成后跑 56 单测；#1/#3 为 git 写操作，执行前建 cache-manager 快照并按串行策略执行。
 

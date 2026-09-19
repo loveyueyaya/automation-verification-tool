@@ -4,6 +4,8 @@
 
 存放本机开发环境地基基线的**证据与清单**：工具链版本、Python 包版本、可复现安装/卸载命令、验收证据、环境坑规避、未验证路径清单、pip 安装前快照（回滚依据）。
 
+> 📌 **新模型快速入口**：当前环境"长什么样"读 `env-baseline_v1.md`（地基清单）；环境出过什么事读三份 09-19 报告（见下）；本目录 `_tools\` 里 40+ 脚本全部可独立复跑（`python 脚本名`，无需参数的占多数）。
+
 与相邻目录的边界：
 
 | 目录 | 放什么 |
@@ -36,7 +38,7 @@
 | 子目录 | 内容 |
 |---|---|
 | `_tools/` | 本目录取证实效工具（**逐脚本已编译+实跑验证**）：`verify_reorg.py`（整理结果全量逐项验证，12 类检查）、`recycle_forensics.py`（回收站删除时间线）、`damage_check.py`（缺失判定）、`analyze_waves.py` / `attribute_waves.py`（波次归因）、`final_assessment.py` / `assess_damage.py` / `list_core_damage.py` / `verify_packages.py` / `sample_noext.py`（损失评估）、`verify_win32_api.py` / `probe_symbols.py`（API 验证）、`verify_env_full.py` / `check_metadata.py` / `verify_e2e.py`（环境与元数据检测）、`watch_files.py`（文件数采样）、`restore_from_wheels.py`（覆盖法修复）、`restore_from_recycle.py`（回收站恢复）、`update_refs.py` / `update_refs2.py` / `update_refs3.py` / `reorganize_root.py` / `reorganize_batch2.py` / `reorganize_batch3.py`（归位与引用同步） |
-| `_tools/legacy_repair/` | 09-18~19 事故期的修复与探针脚本 18 个（`repair_env*.py` / `restore_cuda_and_test` / `restore_missing_dists` / `probe_*.py` / `p21`，及 `_restore_reqs.txt` / `_repair_reqs.txt` / `_repair_small.txt` 版本清单）——保留可复现性 |
+| `_tools/legacy_repair/` | 09-18~19 事故期的修复与探针脚本（保留可复现性），逐脚本：`_probe_step3.py`（盘点实测探针，只读）｜`probe_libs.py`（依赖实测性能，支撑复用/薄封装/自研决策）｜`probe_ocr_tuning.py`（OCR 误识别率量化 + 官方调优参数实测）｜`probe_uia_deep.py`（env_probe 耗时 + UIA 树深度遍历）｜`probe_uia_foreground.py`（前台窗口 UIA 遍历 + wujie 误判核查）｜`repair_env.py`~`repair_env5_autofix.py`（五轮覆盖式修复：wheel 补缺→CUDA DLL→dist-info 元数据→通用自愈，全程只补不删）｜`reorganize_batch2.py`（盘点v2/任务txt/取证工具归位）｜`p21`、`repair_env6`、`restore_cuda_and_test`、`restore_missing_dists`（无扩展名脚本：CUDA 恢复与元数据补齐）｜`_restore_reqs.txt` / `_repair_reqs.txt` / `_repair_small.txt`（版本清单） |
 | `_evidence/` | 原始输出（**逐字证据，不改写**）：`10_env_full_check.txt`（全面检测原始输出）、`01_defender.txt` ~ `09_commands.txt`（取证过程原始记录）、`_watch_log.jsonl`（5 分钟文件数采样）、`reorg-verify_20260919.txt`（整理结果逐项验证报告） |
 | `_local_assets/` | 本地大体积资产（**不入库**，见 .gitignore）：`_wheels/`（官方源 wheel 归档 54 文件，用于覆盖法修复）、`_backup_opencv_stale/`（旧版 opencv 包备份 1,028 文件） |
 
