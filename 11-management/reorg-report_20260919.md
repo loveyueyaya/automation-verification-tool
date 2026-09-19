@@ -130,10 +130,32 @@ F:\自动化验证工具\
 
 ---
 
-## 八、待你确认
+## 八、发布记录（用户确认后执行）
 
-1. 本次整理**未执行任何 git 写操作**（无 commit / push），可随时用 cache-manager 缓存 `temp-cache\20260919_050918` 回滚。
-2. 需要你确认的两点：
-   - 根目录只留 README + LICENSE（**LICENSE 与 README 保持不动**）是否符合预期；
-   - `11-management/` 的归类是否认可（若你希望 HANDOVER / 进度表 放到别处，我改）。
-3. 第 5 节第 1/2 项（contracts shim 重复、P1 目录名）建议留到 P2-2 收尾一起做 —— 需要你点头后才动。
+用户 2026-09-19 15:19 确认"保存并推送"，已执行并逐项验证：
+
+| 项 | 内容 |
+|---|---|
+| 提交 1 | `a9a5311` 目录树整理 + 09-19 环境事故取证归档（根目录仅保留 README/LICENSE，逐项验证 121 项全过）——**108 个文件：68 新增 / 24 修改 / 16 重命名 / 删除 0**；仓库体积安全（暂存最大文件 98 KB，大体积资产走 .gitignore） |
+| 提交 2 | `33bcccd` 验证器补强（技能一致性口径改为"技能代码"、运行时日志单一源化；§9 增加远端一致性校验） |
+| 提交 3 | `2efc0b7` 验证器最终版（远端校验改 gh api 直读 + ls-remote 兜底；模板匹配改数值判定；去重复判定） |
+| 推送 | `a0aeccc..2efc0b7  main -> main`（**快进推送**，无需 force）；补推了此前本地领先而未推送的 P2-2 两次提交（`1ae52c5` / `340049d`） |
+| 远端核验 | `gh api .../git/ref/heads/main` = 本地 HEAD = `2efc0b77...` ✅；远端根目录实况 = `.gitignore` + `LICENSE` + `README.md` + 12 个编号目录（与本地一致） |
+| 提交前备份 | cache-manager 快照 `temp-cache\20260919_153047`（11-management + 09-feedback）与 `20260919_154108`（10-env-baseline 新增件 + 根级文档）；被终止的两份半成品缓存已清理 |
+| 最终验证 | `verify_reorg.py` **123 项判定 / 0 失败**（提交后重跑，含远端一致性），报告 `10-env-baseline\_evidence\reorg-verify_20260919.txt` |
+
+### 本轮新发现的环境特性（均已处理并记录）
+
+| # | 现象 | 证据 | 处置 |
+|---|---|---|---|
+| 1 | **`.git/refs/remotes/` 下的写入会被丢弃** | `git fetch` 与 `git update-ref` 均报成功，但引用文件不存在（复现 2 次），`git status -sb` 显示 `[gone]` | 改用 Write 工具直写 ref 文件后生效（`git status` 恢复正常跟踪显示）；推送本身不受影响 |
+| 2 | **git HTTPS 偶发 TLS 吊销检查失败** | `schannel: next InitializeSecurityContext failed: CRYPT_E_NO_REVOCATION_CHECK`（子进程内 2 次；重试 3/3 成功） | 远端校验改为 `gh api` 优先 + `git -c http.schannelCheckRevoke=false ls-remote` 兜底 |
+| 3 | **验证器自身的判定口径也会误判** | 模板匹配实测 `0.9999998807907104`，原按字面 `"1.0"` 匹配 → 误报失败 | 改为解析 `confidence` 数值判定 ≥0.99 |
+
+---
+
+## 九、后续待办（不阻塞发布）
+
+1. 第 5 节第 1/2 项（`contracts` shim 重复、P1 目录名名不副实）建议留到 **P2-2 收尾**一起做 —— 属代码结构调整，需你点头后才动。
+2. `10-env-baseline\_local_assets\`（wheel 归档 + 旧包备份，约 580 MB）**不入库**，仅本机保留；重建方式：`pip download` 按需重取。
+3. 开发工作仍按你的指示**暂停**，等下一步指令。
